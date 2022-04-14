@@ -1,0 +1,12 @@
+body{
+    text-align: right;
+    direction: rtl;
+    background-color: black;
+}
+
+
+.errors{
+    color: rgb(0, 0, 0);
+    background-color: rgb(90, 93, 93);
+    padding: 20px 30px;
+}

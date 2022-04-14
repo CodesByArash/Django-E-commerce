@@ -1,0 +1,100 @@
+{% load static %}
+
+
+<aside class="main-sidebar sidebar-dark-primary elevation-4">
+    <!-- Brand Logo -->
+    <a href="index3.html" class="brand-link">
+      <img src = "{% static 'registration/adminlte/dist/img/AdminLTELogo.png' %}" alt="" class="brand-image img-circle elevation-3" style="opacity: .8">
+      <span class="brand-text font-weight-light">
+        {% if request.user.is_active and request.user.is_staff %}
+            پنل مدیریت
+        {% else %}
+            پنل کاربری
+        {% endif %}
+        
+      </span>
+    </a>
+
+    <!-- Sidebar -->
+    <div class="sidebar">
+      <!-- Sidebar user panel (optional) -->
+      <div class="user-panel mt-3 pb-3 mb-3 d-flex">
+        <div class="image">
+          <img src="{% static 'registration/adminlte/dist/img/user2-160x160.jpg' %}" class="img-circle elevation-2" alt="User Image">
+        </div>
+        <div class="info">
+          <a href="#" class="d-block">{{ user.get_full_name }}</a>
+        </div>
+      </div>
+
+      <!-- Sidebar Menu -->
+      <nav class="mt-2">
+        <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false">
+          <!-- Add icons to the links using the .nav-icon class
+               with font-awesome or any other icon font library -->
+          <li class="nav-item has-treeview menu-open">
+            <a href="#" class="nav-link active">
+              <i class="nav-icon fas fa-tachometer-alt"></i>
+              <p>
+                {% if request.user.is_active and request.user.is_staff %}
+                 مدیریت سفارشات مشتریان
+            {% else %}
+                تاریخچه ی سفارشات
+            {% endif %}
+                <i class="right fas fa-angle-left"></i>
+              </p>
+            </a>
+            <ul class="nav nav-treeview">
+              <li class="nav-item">
+                <a href="{% url 'account:home'%}" class="nav-link active">
+                  <i class="far fa-circle nav-icon"></i>
+                  <p>{% if request.user.is_active and request.user.is_staff %}
+                    سفارشات مشتریان
+               {% else %}
+                   تاریخچه ی سفارشات
+               {% endif %}</p>
+                </a>
+              </li>
+              {% if request.user.is_active and request.user.is_staff %}
+              <li class="nav-item">
+                <a href="./index2.html" class="nav-link">
+                  <i class="far fa-circle nav-icon"></i>
+                  <p>سفارشات شخصی</p>
+                </a>
+              </li>
+              {% endif %}
+              {% if request.user.is_active and request.user.is_staff %}
+              <li class="nav-item">
+                <a href="http://127.0.0.1:8000/account/product/" class="nav-link">
+                  <i class="far fa-circle nav-icon"></i>
+                  <p>لیست تمام محصولات</p>
+                </a>
+              </li>
+              {% endif %}
+              {% if request.user.is_active and request.user.is_staff %}
+              <li class="nav-item">
+                <a href="http://127.0.0.1:8000/account/product/create/" class="nav-link">
+                  <i class="far fa-circle nav-icon"></i>
+                  <p>ساخت محصول جدید</p>
+                </a>
+              </li>
+              {% endif %}
+          
+          <li class="nav-item">
+            <a href="http://127.0.0.1:8000/account/profile/{{user.id}}/" class="nav-link">
+              <i class="nav-icon far fa-edit text-info"></i>
+              <p>ویرایش پروفایل</p>
+            </a>
+          </li>
+          <li class="nav-item">
+            <a href="{% url 'shop:checkout' %}" class="nav-link">
+              <i class="nav-icon fas fa-shopping-basket text-info"></i>
+              <p>بررسی سبد خرید شخصی</p>
+            </a>
+          </li>
+        </ul>
+      </nav>
+      <!-- /.sidebar-menu -->
+    </div>
+    <!-- /.sidebar -->
+  </aside>

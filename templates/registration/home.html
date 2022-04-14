@@ -1,0 +1,66 @@
+{% extends 'registration/base.html' %}
+
+
+{% block title %}
+{% if request.user.is_active and request.user.is_staff %}
+مدیریت سفارشات مشتریان
+{% else %}
+تاریخچه ی سفارشات
+{% endif %}
+{% endblock %}
+
+
+
+
+{% block main %}
+خوش آمدید {{user.get_full_name}}
+<br>
+<br>
+<div class="row">
+    <div class="col-12">
+        {%if object_list %}
+        <div class="card">
+          
+          <!-- /.card-header -->
+          <div class="card-body table-responsive p-0">
+            <table class="table table-hover">
+              <thead>
+                <tr>
+                  <th>نام و نام خانوادگی کاربر</th>
+                  <th>تاریخ سفارش</th>
+                  <th>وضعیت</th>
+                  <th>قیمت کل فاکتور</th>
+                  
+                </tr>
+              </thead>
+              <tbody>
+                {% for order in object_list %}
+                  <tr >
+                      
+                      <td>{{order.costumer.get_full_name}}</td>
+                      <td>{{order.jpublish}}</td>
+                      <td >{% if order.status == "p" %}
+                        
+                          <p class="badge badge-success">در حال پردازش</p>
+                        {% elif order.status == "s" %}
+                          <p class="badge badge-success">ارسال شده</p>
+                        {% else %}
+                        <p class="badge badge-success">رسیده</p>
+                        {% endif %}
+                      </td>
+                      <td>{{order.total}}</td>
+                      <td><a class="btn btn-warning" href="detail/{{order.id}}/">جزییات سفارش</a></td>
+                  </tr>
+                {%endfor%}
+              </tbody>
+            </table>
+          </div>
+          <!-- /.card-body -->
+        </div>
+        {% else %}
+        <h3>محتوایی برای نمایش وجود ندارد</h3>
+        {% endif %}
+      <!-- /.card -->
+    </div>
+  </div>
+{% endblock %}

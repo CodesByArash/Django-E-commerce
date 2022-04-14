@@ -1,0 +1,33 @@
+body{
+    background-color: rgb(49, 49, 49);
+    direction: rtl;
+    text-align: right;
+}
+
+.card-text{
+    color: green;
+    font-weight: 800;
+    text-align: center;
+}
+
+.card-title{
+    font-weight: 1000;
+    text-align: center;
+}
+
+.card{
+    background-color: rgb(36, 35, 35);
+    color: rgb(156, 156, 156);
+    padding: 5mm;
+}
+
+.search{
+    color: rgb(139, 139, 139);
+    background-color: black;
+}
+
+.searchbar{
+    color: rgb(161, 161, 161);
+    background-color: black;
+    border-color: rgb(0, 0, 0);
+}
