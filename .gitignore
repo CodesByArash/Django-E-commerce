@@ -3,3 +3,4 @@ venv
 images
 *.png
 *.jpg
+.gitattributes
