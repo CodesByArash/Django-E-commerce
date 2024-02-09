@@ -1,6 +1,6 @@
-
 from shop.models import Product
 from django.http import Http404
+
 
 class FieldMixins():
 
@@ -10,7 +10,6 @@ class FieldMixins():
         else:
             raise Http404*("شما اجازه ی دیدن این صفحه را ندارید")
         return super().dispatch(request,*args ,**kwargs)
-
 
 
 class SuperUserMixin():

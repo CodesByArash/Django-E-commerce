@@ -3,6 +3,7 @@
 
 {% block title %}
 {% if request.user.is_active and request.user.is_staff %}
+پروفایل کاربری
 {% else %}
 پروفایل کاربری
 {% endif %}
@@ -18,6 +19,7 @@
     {{form|crispy}}
 
     <button class="btn btn-success">تایید</button>
-    </form>>
+    </form>
+    <br>
 
 {% endblock %}

@@ -24,5 +24,5 @@ urlpatterns += [
     path('product/update/<int:pk>/',ProductUpdate.as_view(),name="product-update"),
     path('product/delete/<int:pk>/',ProductDelete.as_view(),name="product-delete"),
     path('signup/',signup,name="signup"),
-    path('profile/<int:pk>/',Profile.as_view(),name="profileupdate"),
+    path('profile/<int:pk>/',Profile.as_view(),name="profile"),
     ]

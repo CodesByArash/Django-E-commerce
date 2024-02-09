@@ -13,9 +13,8 @@ from django.shortcuts import redirect
 from django.contrib.auth import authenticate,login
 import json
 from .forms import SignUpForm
-# Create your views here.
-
 from django.urls import reverse_lazy
+# Create your views here.
 
 
 # @login_required
@@ -26,7 +25,7 @@ from django.urls import reverse_lazy
 
 class orderListview (LoginRequiredMixin,ListView):
     
-    template_name       = "registration/home.html"
+    template_name = "registration/home.html"
 
     def get_queryset(self):
         if self.request.user.is_staff:
@@ -79,10 +78,16 @@ class Profile(UpdateView):
     model    =   User
     fields   =   ['username','email','first_name', 'last_name','zipcode','address','phone','city',]
     template_name="registration/profile.html"
+    
+    def get_success_url(self):
+        # Get the user's PK
+        user_pk = self.request.user.pk
+        # Construct the success URL with the user's PK as a parameter
+        success_url = reverse_lazy("account:profile", kwargs={"pk": user_pk})
+        return success_url
 
-    success_url = reverse_lazy("account:profile")
     def get_object(self):
-        return User.objects.get(pk = self.request.user.pk)
+        return User.objects.get(pk=self.request.user.pk)
 
 
 def signup(request):

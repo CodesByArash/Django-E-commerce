@@ -42,12 +42,14 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    # django apps
     'shop.apps.ShopConfig',
     'account.apps.AccountConfig',
+    # django third party apps
     'widget_tweaks',
     'crispy_forms',
-    #'account',
-    # 'shop',
+    # drf third party apps
+    'drf_yasg',
 ]
 
 
