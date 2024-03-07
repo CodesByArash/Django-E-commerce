@@ -50,6 +50,9 @@ INSTALLED_APPS = [
     'crispy_forms',
     # drf third party apps
     'drf_yasg',
+    # drf apps
+    "api.api_account",   
+    "api.api_shop",
 ]
 
 
