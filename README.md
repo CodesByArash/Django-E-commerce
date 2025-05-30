@@ -1,4 +1,4 @@
-# Django Shop With RestApi using DRF and JWT authentication
+# Django E-Commerce With RestApi using DRF and JWT authentication
 
 ## Setup
 
