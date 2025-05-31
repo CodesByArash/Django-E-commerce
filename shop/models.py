@@ -9,12 +9,14 @@ from extensions.utils import jalali_converter
 from PIL import Image
 from io import BytesIO
 from django.core.files import File
+from django.core.validators import MinValueValidator
+from django.utils.text import slugify
 
 
 
 class Category(models.Model):
     title    = models.CharField(max_length=200 , verbose_name="دسته بندی",)
-    Slug     = models.CharField(max_length=200 , verbose_name="آدرس",)
+    slug     = models.SlugField(max_length=200 , verbose_name="آدرس", unique=True)
     status   = models.BooleanField(default=True , verbose_name="نمایش داده شود؟",)
     position = models.IntegerField(verbose_name='موفعیت')
 
@@ -24,7 +26,12 @@ class Category(models.Model):
         verbose_name_plural='دسته بندی ها'
         
     def __str__(self):
-        return self.name
+        return self.title
+    
+    def save(self, *args, **kwargs):
+        if not self.slug:
+            self.slug = slugify(self.title)
+        super().save(*args, **kwargs)
     
     def get_absolute_url(self):
         return f'/{self.slug}/'
@@ -53,7 +60,11 @@ class Product(models.Model):
         verbose_name_plural='محصولات'
     
     def get_absolute_url(self):
-        return f'/{self.category.slug}/{self.slug}/'
+        # چون category یک ManyToManyField است، از اولین دسته‌بندی استفاده می‌کنیم
+        first_category = self.category.first()
+        if first_category:
+            return f'/{first_category.slug}/{self.slug}/'
+        return f'/{self.slug}/'
     
     def get_thumbnail(self):
         if self.thumbnail:
@@ -75,6 +86,105 @@ class Product(models.Model):
 
         return thumbnail
     
+
+class Cart(models.Model):
+    user = models.ForeignKey(
+        'account.User',  # استفاده از string reference
+        on_delete=models.CASCADE,
+        verbose_name='کاربر',
+        related_name='carts'
+    )
+    created_at = models.DateTimeField(
+        auto_now_add=True,
+        verbose_name='تاریخ ایجاد'
+    )
+    updated_at = models.DateTimeField(
+        auto_now=True,
+        verbose_name='آخرین بروزرسانی'
+    )
+    is_active = models.BooleanField(
+        default=True,
+        verbose_name='فعال'
+    )
+
+    class Meta:
+        verbose_name = 'سبد خرید'
+        verbose_name_plural = 'سبدهای خرید'
+        ordering = ['-updated_at']
+
+    def __str__(self):
+        return f'سبد خرید {self.user.email} - {self.created_at.strftime("%Y-%m-%d")}'
+
+    @property
+    def total_price(self):
+        """محاسبه قیمت کل سبد خرید"""
+        return sum(item.total_price for item in self.items.all())
+
+    @property
+    def total_items(self):
+        """تعداد کل آیتم‌ها در سبد خرید"""
+        return sum(item.quantity for item in self.items.all())
+
+    def clear(self):
+        """پاک کردن تمام آیتم‌های سبد خرید"""
+        self.items.all().delete()
+
+class CartItem(models.Model):
+    cart = models.ForeignKey(
+        Cart,
+        on_delete=models.CASCADE,
+        related_name='items',
+        verbose_name='سبد خرید'
+    )
+    product = models.ForeignKey(
+        Product,
+        on_delete=models.CASCADE,
+        verbose_name='محصول'
+    )
+    quantity = models.PositiveIntegerField(
+        default=1,
+        validators=[MinValueValidator(1)],
+        verbose_name='تعداد'
+    )
+    price = models.DecimalField(
+        max_digits=10,
+        decimal_places=2,
+        verbose_name='قیمت واحد'
+    )
+    created_at = models.DateTimeField(
+        auto_now_add=True,
+        verbose_name='تاریخ اضافه شدن'
+    )
+    updated_at = models.DateTimeField(
+        auto_now=True,
+        verbose_name='آخرین بروزرسانی'
+    )
+
+    class Meta:
+        verbose_name = 'آیتم سبد خرید'
+        verbose_name_plural = 'آیتم‌های سبد خرید'
+        unique_together = ('cart', 'product')
+
+    def __str__(self):
+        return f'{self.product.title} - {self.quantity} عدد'
+
+    @property
+    def total_price(self):
+        """محاسبه قیمت کل آیتم"""
+        return self.price * self.quantity
+
+    def increase_quantity(self, amount=1):
+        """افزایش تعداد محصول"""
+        self.quantity += amount
+        self.save()
+
+    def decrease_quantity(self, amount=1):
+        """کاهش تعداد محصول"""
+        if self.quantity > amount:
+            self.quantity -= amount
+            self.save()
+        else:
+            self.delete()
 
 class Order(models.Model):
     STATUS_CHOICES =(

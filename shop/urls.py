@@ -1,5 +1,3 @@
-
-
 """DrugStore URL Configuration
 
 The `urlpatterns` list routes URLs to views. For more information please see:
@@ -28,6 +26,9 @@ urlpatterns = [
     path('checkout/',views.checkout,name='checkout'),
     path('category/<slug:slug>',views.category,name='category'),
     path('category/<slug:slug>/page/<int:page>',views.category,name='category'),
-    path('success/',views.success , name='success')
+    path('success/',views.success , name='success'),
+    path('cart/add/<int:product_id>/', views.add_to_cart, name='add_to_cart'),
+    path('cart/update/<int:product_id>/', views.update_cart, name='update_cart'),
+    path('cart/remove/<int:product_id>/', views.remove_from_cart, name='remove_from_cart'),
 ]
 
