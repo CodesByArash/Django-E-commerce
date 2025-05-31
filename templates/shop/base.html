@@ -36,24 +36,33 @@
                             </li>
                             
                             <li class="nav-item">
-                                <a id="cart" href="{% url 'shop:checkout' %}" class="btn btn-secondary">
+                                <a id="cart" href="{% url 'shop:cart' %}" class="btn btn-secondary">
                                     <i class="fas fa-shopping-cart"></i>
-                                    سبد خرید
+                                    سبد خرید {% if request.user.is_authenticated %}({{ active_cart.total_items|default:0 }}){% endif %}
                                 </a>
                             </li>
                             
-                            {% for cat in category %}
+                            {% for cat in categories %}
                             <li class="nav-item {% if request.resolver_match.kwargs.slug == cat.slug %}active{% endif %}">
                                 <a class="nav-link" href="{% url 'shop:category' cat.slug %}">{{cat.title}}</a>
                             </li>
                             {% endfor %}
                             
-                            <li class="nav-item">
-                                <a class="nav-link" href="{% url 'account:signup' %}">ثبت نام</a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link" href="{% url 'account:home' %}">ورود به پنل کاربری</a>
-                            </li>
+                            {% if user.is_authenticated %}
+                                <li class="nav-item">
+                                    <a class="nav-link" href="{% url 'account:home' %}">پنل کاربری</a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link" href="{% url 'account:logout' %}">خروج</a>
+                                </li>
+                            {% else %}
+                                <li class="nav-item">
+                                    <a class="nav-link" href="{% url 'account:signup' %}">ثبت نام</a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link" href="{% url 'account:login' %}">ورود</a>
+                                </li>
+                            {% endif %}
                         </ul>
                     </div>
                 </nav>
@@ -63,10 +72,10 @@
         <!-- Search Form -->
         <div class="row">
             <div class="col-md-12">
-                <form class="card card-sm">
+                <form class="card card-sm" action="{% url 'shop:index' %}" method="get">
                     <div class="card-body row no-gutters align-items-center">
                         <div class="col">
-                            <input type="search" class="searchbar form-control form-control-borderless" name='item_name' placeholder="جستجوی محصولات">
+                            <input type="search" class="searchbar form-control form-control-borderless" name="q" placeholder="جستجوی محصولات" value="{{ search_query }}">
                         </div>
                         <div class="col-auto">
                             <button class="search btn btn-success" type="submit">جستجو</button>

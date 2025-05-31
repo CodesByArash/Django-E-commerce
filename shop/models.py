@@ -89,7 +89,7 @@ class Product(models.Model):
 
 class Cart(models.Model):
     user = models.ForeignKey(
-        'account.User',  # استفاده از string reference
+        'account.User',
         on_delete=models.CASCADE,
         verbose_name='کاربر',
         related_name='carts'
@@ -111,6 +111,19 @@ class Cart(models.Model):
         verbose_name = 'سبد خرید'
         verbose_name_plural = 'سبدهای خرید'
         ordering = ['-updated_at']
+        constraints = [
+            models.UniqueConstraint(
+                fields=['user', 'is_active'],
+                condition=models.Q(is_active=True),
+                name='unique_active_cart_per_user'
+            )
+        ]
+
+    def save(self, *args, **kwargs):
+        if self.is_active:
+            # غیرفعال کردن سایر سبدهای خرید فعال کاربر
+            Cart.objects.filter(user=self.user, is_active=True).exclude(pk=self.pk).update(is_active=False)
+        super().save(*args, **kwargs)
 
     def __str__(self):
         return f'سبد خرید {self.user.email} - {self.created_at.strftime("%Y-%m-%d")}'

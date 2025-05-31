@@ -5,54 +5,123 @@
 
 {% block extra_css %}
 <link rel="stylesheet" href="{% static 'shop/index.css' %}">
+<style>
+    .card {
+        margin-bottom: 20px;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        transition: transform 0.2s;
+    }
+    .card:hover {
+        transform: translateY(-5px);
+    }
+    .card-img-top {
+        object-fit: cover;
+        height: 200px;
+    }
+    .card-title {
+        font-size: 1.1rem;
+        margin-bottom: 10px;
+    }
+    .card-title a {
+        color: #333;
+        text-decoration: none;
+    }
+    .card-title a:hover {
+        color: #007bff;
+    }
+    .card-text {
+        color: #28a745;
+        font-weight: bold;
+        font-size: 1.2rem;
+        margin-bottom: 15px;
+    }
+    .form-group {
+        margin-bottom: 15px;
+    }
+    .btn-warning {
+        margin-right: 5px;
+    }
+    .pagination {
+        margin-top: 30px;
+    }
+    .page-link {
+        color: #007bff;
+    }
+    .page-item.active .page-link {
+        background-color: #007bff;
+        border-color: #007bff;
+    }
+</style>
 {% endblock %}
 
 {% block content %}
 <div class="row">
-    {% for product in product_obj %}
-        <div class="col-md-3">
-            <div class="card">
-                <img src="{{ product.image }}" class="card-img-top" height="200">
-                <div class="card-body">
-                    <div class="card-title">
-                        <a id="nm{{product.id}}" href="{{ product.id }}/">{{product.title}}</a>
-                    </div>
-                    <div id="price{{product.id}}" class="card-text">
-                        {{product.price}} تومان
-                    </div>
+    {% if product_obj %}
+        {% for product in product_obj %}
+            <div class="col-md-3">
+                <div class="card">
+                    {% if product.image %}
+                        <img src="{{ product.image.url }}" class="card-img-top" alt="{{ product.title }}">
+                    {% else %}
+                        <img src="{% static 'shop/images/no-image.png' %}" class="card-img-top" alt="بدون تصویر">
+                    {% endif %}
+                    <div class="card-body">
+                        <div class="card-title">
+                            <a id="nm{{product.id}}" href="{% url 'shop:detail' product.id %}">{{product.title}}</a>
+                        </div>
+                        <div id="price{{product.id}}" class="card-text">
+                            {{product.price|floatformat:0}} تومان
+                        </div>
 
-                    <div class="form-group">
-                        <label for="quantity">تعداد:</label>
-                        <input type="number" class="form-control" id="quantity{{product.id}}" value="1" min="1" style="width: 100px; display: inline-block;">
-                    </div>
+                        <div class="form-group">
+                            <label for="quantity{{product.id}}">تعداد:</label>
+                            <input type="number" class="form-control" id="quantity{{product.id}}" value="1" min="1" style="width: 100px; display: inline-block;">
+                        </div>
 
-                    <a class="btn btn-warning" href="/{{product.id}}/">جزییات</a>
-                    <button id="{{product.id}}" class="cartbutton btn btn-warning">افزودن به سبد خرید</button>
+                        <a class="btn btn-info" href="{% url 'shop:detail' product.id %}">جزییات</a>
+                        <button id="{{product.id}}" class="cartbutton btn btn-success">افزودن به سبد خرید</button>
+                    </div>
                 </div>
             </div>
+        {% endfor %}
+    {% else %}
+        <div class="col-12 text-center">
+            <h3>محصولی یافت نشد</h3>
         </div>
-    {% endfor %}
+    {% endif %}
 </div>
 
+{% if product_obj.has_other_pages %}
 <div class="row">
     <div class="col-md-3 offset-md-4">
         <ul class="pagination">
             {% if product_obj.has_previous %}
                 <li class="page-item">
-                    <a class="page-link" href="?page={{ product_obj.previous_page_number }}">صفحه ی قبلی</a>
+                    <a class="page-link" href="?page={{ product_obj.previous_page_number }}{% if search_query %}&q={{ search_query }}{% endif %}{% if category %}&category={{ category }}{% endif %}">صفحه ی قبلی</a>
                 </li>
             {% endif %}
-            <li class="page-item active">
-                <a class="page-link" href="?page={{ product_obj.number }}">{{ product_obj.number }}</a>
-            </li>
+            
+            {% for i in product_obj.paginator.page_range %}
+                {% if product_obj.number == i %}
+                    <li class="page-item active">
+                        <a class="page-link" href="#">{{ i }}</a>
+                    </li>
+                {% else %}
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ i }}{% if search_query %}&q={{ search_query }}{% endif %}{% if category %}&category={{ category }}{% endif %}">{{ i }}</a>
+                    </li>
+                {% endif %}
+            {% endfor %}
+            
             {% if product_obj.has_next %}
                 <li class="page-item">
-                    <a class="page-link" href="?page={{ product_obj.next_page_number }}">صفحه ی بعدی</a>
+                    <a class="page-link" href="?page={{ product_obj.next_page_number }}{% if search_query %}&q={{ search_query }}{% endif %}{% if category %}&category={{ category }}{% endif %}">صفحه ی بعدی</a>
                 </li>
             {% endif %}
         </ul>
     </div>
 </div>
+{% endif %}
 {% endblock %}
 
 {% block extra_js %}
@@ -71,7 +140,7 @@
             success: function(response) {
                 if (response.status === 'success') {
                     alert(response.message);
-                    updateCartCount(response.cart_items_count);
+                    updateCartCount(response.cart_count);
                 } else {
                     alert('خطا در افزودن به سبد خرید');
                 }
@@ -83,7 +152,8 @@
     });
     
     function updateCartCount(count) {
-        document.getElementById("cart").innerHTML = "سبد خرید (" + count + ")";
+        var cartLink = document.getElementById("cart");
+        cartLink.innerHTML = '<i class="fas fa-shopping-cart"></i> سبد خرید (' + count + ')';
     }
 </script>
 {% endblock %}

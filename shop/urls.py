@@ -18,17 +18,24 @@ from django.urls import include, re_path
 from django.contrib import admin
 from django.urls import path,include
 from shop import views
+from .views.product_views import ProductListView, ProductDetailView, AddToCartView, CategoryView
+from .views.cart_views import UpdateCartView, RemoveFromCartView, ClearCartView, CheckoutView
+from django.views.generic import TemplateView, RedirectView
 
 app_name="shop"
 urlpatterns = [
-    path('', views.index, name='index'),
-    path('<int:id>/',views.detail,name='detail'),
-    path('checkout/',views.checkout,name='checkout'),
-    path('category/<slug:slug>',views.category,name='category'),
-    path('category/<slug:slug>/page/<int:page>',views.category,name='category'),
-    path('success/',views.success , name='success'),
-    path('cart/add/<int:product_id>/', views.add_to_cart, name='add_to_cart'),
-    path('cart/update/<int:product_id>/', views.update_cart, name='update_cart'),
-    path('cart/remove/<int:product_id>/', views.remove_from_cart, name='remove_from_cart'),
+    # Product URLs
+    path('', ProductListView.as_view(), name='index'),
+    path('product/<int:pk>/', ProductDetailView.as_view(), name='detail'),
+    path('cart/add/<int:pk>/', AddToCartView.as_view(), name='add_to_cart'),
+    path('category/<slug:slug>/', CategoryView.as_view(), name='category'),
+    
+    # Cart URLs - Redirect cart to checkout
+    path('cart/', RedirectView.as_view(pattern_name='shop:checkout', permanent=True), name='cart'),
+    path('cart/update/', UpdateCartView.as_view(), name='update_cart'),
+    path('cart/remove/', RemoveFromCartView.as_view(), name='remove_from_cart'),
+    path('cart/clear/', ClearCartView.as_view(), name='clear_cart'),
+    path('checkout/', CheckoutView.as_view(), name='checkout'),
+    path('success/', TemplateView.as_view(template_name='shop/success.html'), name='success'),
 ]
 

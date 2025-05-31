@@ -5,6 +5,76 @@
 
 {% block extra_css %}
 <link rel="stylesheet" href="{% static 'shop/detail.css' %}">
+<style>
+    .product-detail {
+        background: #fff;
+        padding: 30px;
+        border-radius: 10px;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        margin: 20px 0;
+    }
+    .product-image {
+        width: 100%;
+        height: 400px;
+        object-fit: cover;
+        border-radius: 5px;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+    .product-title {
+        font-size: 2rem;
+        color: #333;
+        margin-bottom: 20px;
+    }
+    .product-price {
+        font-size: 1.5rem;
+        color: #28a745;
+        font-weight: bold;
+        margin-bottom: 20px;
+    }
+    .product-description {
+        font-size: 1.1rem;
+        color: #666;
+        line-height: 1.6;
+        margin-bottom: 30px;
+    }
+    .quantity-input {
+        width: 100px;
+        display: inline-block;
+        margin-right: 10px;
+    }
+    .button-container {
+        margin-top: 30px;
+    }
+    .btn-add-to-cart {
+        background-color: #28a745;
+        color: white;
+        padding: 10px 20px;
+        border: none;
+        border-radius: 5px;
+        margin-left: 10px;
+        transition: background-color 0.2s;
+    }
+    .btn-add-to-cart:hover {
+        background-color: #218838;
+        color: white;
+    }
+    .btn-outline-secondary {
+        padding: 10px 20px;
+        border-radius: 5px;
+        transition: all 0.2s;
+    }
+    .btn-outline-secondary:hover {
+        background-color: #6c757d;
+        color: white;
+    }
+    .form-group {
+        margin-bottom: 20px;
+    }
+    .form-group label {
+        font-weight: bold;
+        margin-left: 10px;
+    }
+</style>
 {% endblock %}
 
 {% block content %}
@@ -14,12 +84,16 @@
         <div class="product-detail">
             <div class="row">
                 <div class="col-md-6">
-                    <img src="{{ product_obj.image.url }}" class="product-image" alt="{{ product_obj.title }}">
+                    {% if product_obj.image %}
+                        <img src="{{ product_obj.image.url }}" class="product-image" alt="{{ product_obj.title }}">
+                    {% else %}
+                        <img src="{% static 'shop/images/no-image.png' %}" class="product-image" alt="بدون تصویر">
+                    {% endif %}
                 </div>
                 <div class="col-md-6">
                     <h1 class="product-title">{{ product_obj.title }}</h1>
-                    <div class="product-price">{{ product_obj.price }} تومان</div>
-                    <p class="product-description">{{ product_obj.description }}</p>
+                    <div class="product-price">{{ product_obj.price|floatformat:0 }} تومان</div>
+                    <p class="product-description">{{ product_obj.description|linebreaks }}</p>
                     
                     <div class="form-group">
                         <label for="quantity">تعداد:</label>
@@ -50,8 +124,13 @@
         var item_id = this.id.toString();
         var quantity = parseInt(document.getElementById("quantity").value);
         
+        if (quantity < 1) {
+            alert('تعداد باید بیشتر از صفر باشد');
+            return;
+        }
+        
         $.ajax({
-            url: '/cart/add/' + item_id + '/',
+            url: "{% url 'shop:add_to_cart' product_obj.id %}",
             method: 'POST',
             data: {
                 'quantity': quantity,
@@ -60,7 +139,7 @@
             success: function(response) {
                 if (response.status === 'success') {
                     alert(response.message);
-                    updateCartCount(response.cart_items_count);
+                    updateCartCount(response.cart_count);
                 } else {
                     alert('خطا در افزودن به سبد خرید');
                 }
@@ -72,7 +151,8 @@
     });
     
     function updateCartCount(count) {
-        document.getElementById("cart").innerHTML = '<i class="fas fa-shopping-cart"></i> سبد خرید (' + count + ')';
+        var cartLink = document.getElementById("cart");
+        cartLink.innerHTML = '<i class="fas fa-shopping-cart"></i> سبد خرید (' + count + ')';
     }
 </script>
 {% endblock %}
