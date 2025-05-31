@@ -1,188 +1,91 @@
+{% extends 'shop/base.html' %}
 {% load static %}
 
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+{% block title %}فروشگاه{% endblock %}
 
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'shop/index.css' %}">
+{% endblock %}
 
-
-    <script
-		src="https://code.jquery.com/jquery-3.6.0.js"
-	    integrity="sha256-H+K7U5CnXl1h5ywQfKtSj8PCmoN9aaq30gDh27Xc0jk="
-		crossorigin="anonymous">
-    </script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
-
-<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
-    <link rel="stylesheet" href="{% static 'shop/style.css' %}">
-
-
-
-    <title>Shop</title>
-</head>
-
-<body>
-    <div class="container">
-
-        <div class="row">
-            <div class="col-md-12" >
-                <nav class=" navbar navbar-expand-lg navbar-dark bg-dark ">
-                    <a class="navbar-brand " href="{% url 'shop:index' %}">فروشگاه</a>
-                    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-                      <span class="navbar-toggler-icon"></span>
-                    </button>
-                    <div class="collapse navbar-collapse" id="navbarNav">
-                      <ul class=" navbar-nav">
-                        <li class="nav-item active">
-                          <a class="nav-link" href="">خانه <span class="sr-only">(current)</span></a>
-                        </li>
-                        
-                        <li class="nav-item">
-                            <button id="cart" type="button" data-html= "true" class=" btn btn-secondary" data-container="body" data-toggle="popover" data-placement="bottom" data-content="Vivamus
-                            sagittis lacus vel augue laoreet rutrum faucibus.">
-                              سبد خرید
-                            </button>
-                        </li>
-                        
-                        {% for cat in category %}
-
-                        <li class="nav-item">
-                            <a class="nav-link" href="{% url 'shop:index' %}">{{cat.title}}</a>
-                          </li>
-
-                        {% endfor %}
-                        
-                        <li class="nav-item">
-                            <a class="nav-link" href="{% url 'account:signup' %}">ثبت نام</a>
-                          </li>
-                        <li class="nav-item">
-                        
-                          <a class="nav-link " href="{% url 'account:home' %}">  ورود به پنل کاربری</a>
-
-                        </li>
-                      </ul>
+{% block content %}
+<div class="row">
+    {% for product in product_obj %}
+        <div class="col-md-3">
+            <div class="card">
+                <img src="{{ product.image }}" class="card-img-top" height="200">
+                <div class="card-body">
+                    <div class="card-title">
+                        <a id="nm{{product.id}}" href="{{ product.id }}/">{{product.title}}</a>
                     </div>
-                  </nav>
-            </div>
-        </div>
-
-        <div class="row">
-            <div class="col-md-12">
-                <form class="card card-sm">
-                    <div class="card-body row no-gutters align-items-center">
-                        <div class="col">
-                            <input type="search" class="searchbar form-control form-control-borderless" name='item_name' placeholder="جستجو ی محصولات">
-                        </div>
-                        <div class="col-auto">
-                            <button class="search btn btn-success" type="submit">جستجو</button>
-                        </div>
+                    <div id="price{{product.id}}" class="card-text">
+                        {{product.price}} تومان
                     </div>
-                </form>
-            </div>
-        </div>
 
-        <div class="row">
-        {%  for product in product_obj  %}
-            <div class="col-md-3">
-                <div class="card">
-                    <img src="{{ product.image }}" class="card-img-top" height="200">
-                    <div class="card-body">
-                        <div   class = "card-title">
-                            <a id="nm{{product.id}}" href="{{ product.id }}/">{{product.title}}</a>
-                        </div>
-                        <div id="price{{product.id}}" class="card-text">
-                            {{product.price}} تومان
-                        </div>
-
-                        <a class="btn btn-warning" href="/{{product.id}}/">جزییات</a>
-
-                        <button id="{{product.id}}" class="cartbutton btn btn-warning">خرید</button>
-
+                    <div class="form-group">
+                        <label for="quantity">تعداد:</label>
+                        <input type="number" class="form-control" id="quantity{{product.id}}" value="1" min="1" style="width: 100px; display: inline-block;">
                     </div>
+
+                    <a class="btn btn-warning" href="/{{product.id}}/">جزییات</a>
+                    <button id="{{product.id}}" class="cartbutton btn btn-warning">افزودن به سبد خرید</button>
                 </div>
             </div>
-        {% endfor %}
         </div>
-        <div class="row">
-            <div class="col-md-3 offset-md-4">
-                <ul class="pagination">
-                    {% if product_obj.has_previous %}
-                        <li class="page-item">
-                            <a class="page-link" href="?page={{ product_obj.previous_page_number }}">صفحه ی قبلی</a>
-                        </li>
-                    {% endif %}
-                    <li class="page-item active">
-                        <a class="page-link"  href="?page={{ product_obj.number }}">{{ product_obj.number }}</a>
-                    </li>
-                    {% if product_obj.has_next %}
-                    <li class="page-item">
-                        <a class="page-link"  href="?page={{ product_obj.next_page_number }}">صفحه ی بعدی</a>
-                    </li>
-                    {% endif %}
-                </ul>
-            </div>
-        </div>
+    {% endfor %}
+</div>
+
+<div class="row">
+    <div class="col-md-3 offset-md-4">
+        <ul class="pagination">
+            {% if product_obj.has_previous %}
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ product_obj.previous_page_number }}">صفحه ی قبلی</a>
+                </li>
+            {% endif %}
+            <li class="page-item active">
+                <a class="page-link" href="?page={{ product_obj.number }}">{{ product_obj.number }}</a>
+            </li>
+            {% if product_obj.has_next %}
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ product_obj.next_page_number }}">صفحه ی بعدی</a>
+                </li>
+            {% endif %}
+        </ul>
     </div>
-</body>
+</div>
+{% endblock %}
 
+{% block extra_js %}
 <script type="text/javascript">
-    console.log(localStorage.getItem('cart'));
-    if(localStorage.getItem('cart')==null){
-        var cart = {};
-    }else{
-        cart = JSON.parse(localStorage.getItem("cart"))
-    }
-    
-    $(document).on('click','.cartbutton',function(){
+    $(document).on('click', '.cartbutton', function() {
         var item_id = this.id.toString();
+        var quantity = parseInt(document.getElementById("quantity" + item_id).value);
         
-        if(cart[item_id] != undefined){
-            quantity=cart[item_id][0]+1;
-            cart[item_id][0]= quantity
-            cart[item_id][2]= cart[item_id][2] + parseFloat(document.getElementById("price"+item_id).innerHTML);
-
-            // alert(quantity)
-        }else{
-            quantity=1;
-            name=document.getElementById("nm"+item_id).innerHTML;
-            price=parseFloat(document.getElementById("price"+item_id).innerHTML);
-            cart[item_id]=[quantity,name,price];
-            
-        }
-        console.log(cart)
-        localStorage.setItem('cart',JSON.stringify(cart));
-        
-        document.getElementById("cart").innerHTML="سبد خرید ("+Object.keys(cart).length + ")";
-    });
-
-    $(document).on('click','.checkout',function(){
-        DisplayCart(cart);
+        $.ajax({
+            url: '/cart/add/' + item_id + '/',
+            method: 'POST',
+            data: {
+                'quantity': quantity,
+                'csrfmiddlewaretoken': '{{ csrf_token }}'
+            },
+            success: function(response) {
+                if (response.status === 'success') {
+                    alert(response.message);
+                    updateCartCount(response.cart_items_count);
+                } else {
+                    alert('خطا در افزودن به سبد خرید');
+                }
+            },
+            error: function() {
+                alert('خطا در ارتباط با سرور');
+            }
+        });
     });
     
-    DisplayCart(cart);
-    function DisplayCart(cart){
-        var cartString="";
-        var cartIndex=1;
-        
-        for (var x in cart){
-            cartString+=cartIndex;
-            cartString+=":"+document.getElementById("nm"+x.toString()).innerHTML + " تعداد " + cart[x][0] +"</br>";
-            cartIndex+=1;
-            
-        }
-        cartString += "<a href='/checkout/' button class='btn btn-warning' id='checkout'>پرداخت هزینه</a>";
-        
-        document.getElementById("cart").setAttribute('data-content',cartString);
-        $('[data-toggle="popover"]').popover();
+    function updateCartCount(count) {
+        document.getElementById("cart").innerHTML = "سبد خرید (" + count + ")";
     }
-    
-
 </script>
-
-</html>
+{% endblock %}
 
 

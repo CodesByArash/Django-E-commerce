@@ -1,139 +1,78 @@
+{% extends 'shop/base.html' %}
 {% load static %}
 
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+{% block title %}{{ product_obj.title }}{% endblock %}
 
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'shop/detail.css' %}">
+{% endblock %}
 
-
-    <script
-		src="https://code.jquery.com/jquery-3.6.0.js"
-	    integrity="sha256-H+K7U5CnXl1h5ywQfKtSj8PCmoN9aaq30gDh27Xc0jk="
-		crossorigin="anonymous">
-    </script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
-
-<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
-    <link rel="stylesheet" href="{% static 'shop/style.css' %}">
-    <title>{{product_obj.title}}</title>
-</head>
-<body>
-    <div class="row">
-        <div class="col-md-12" >
-            <nav class=" navbar navbar-expand-lg navbar-dark bg-dark ">
-                <a class="navbar-brand " href="#">فروشگاه</a>
-                <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-                  <span class="navbar-toggler-icon"></span>
-                </button>
-                <div class="collapse navbar-collapse" id="navbarNav">
-                  <ul class=" navbar-nav">
-                    <li class="nav-item active">
-                      <a class="nav-link" href="#">خانه <span class="sr-only">(current)</span></a>
-                    </li>
+{% block content %}
+<!-- Product Detail -->
+<div class="row">
+    <div class="col-md-12">
+        <div class="product-detail">
+            <div class="row">
+                <div class="col-md-6">
+                    <img src="{{ product_obj.image.url }}" class="product-image" alt="{{ product_obj.title }}">
+                </div>
+                <div class="col-md-6">
+                    <h1 class="product-title">{{ product_obj.title }}</h1>
+                    <div class="product-price">{{ product_obj.price }} تومان</div>
+                    <p class="product-description">{{ product_obj.description }}</p>
                     
-                    <li class="nav-item">
-                        <a href="{% url 'shop:checkout' %}"  id="cart" type="button" data-html= "true" class=" btn btn-secondary" data-container="body" data-toggle="popover" data-placement="bottom" data-content="Vivamus
-                        sagittis lacus vel augue laoreet rutrum faucibus.">
-                          سبد خرید
+                    <div class="form-group">
+                        <label for="quantity">تعداد:</label>
+                        <input type="number" class="form-control quantity-input" id="quantity" value="1" min="1">
+                    </div>
+                    
+                    <div class="button-container">
+                        <button id="{{ product_obj.id }}" class="btn btn-add-to-cart">
+                            <i class="fas fa-cart-plus"></i>
+                            افزودن به سبد خرید
+                        </button>
+                        
+                        <a href="{% url 'shop:index' %}" class="btn btn-outline-secondary">
+                            <i class="fas fa-arrow-right"></i>
+                            بازگشت به فروشگاه
                         </a>
-                    </li>
-                    
-                    {% for cat in category %}
-
-                    <li class="nav-item">
-                        <a class="nav-link" href="{% url 'shop:index' %}">{{cat.title}}</a>
-                      </li>
-
-                    {% endfor %}
-                    
-                    <li class="nav-item">
-                        <a class="nav-link" href="#">ثبت نام</a>
-                      </li>
-                    <li class="nav-item">
-                    
-                      <a class="nav-link " href="{% url 'account:home' %}">  ورود به پنل کاربری</a>
-
-                    </li>
-                  </ul>
-                </div>
-              </nav>
-        </div>
-    </div>
-
-    <div class="container">
-        <div class="row">
-            <div class="col-md-6">
-                <div class="row">
-                    <div class="col-md-12">
-                        <img src="{{ product_obj.image.url }}">
                     </div>
-                </div>
-            </div>
-            <div class="col-md-6">
-                <div class="row">
-                    <div class="col-md-12">
-                        نام محصول : {{ product_obj.title }}
-                    </div>
-                </div>
-                <div class="row">
-                    <div class="col-md-12 ">
-                        قیمت (ریال) :{{ product_obj.price }}
-                    </div>
-                </div>
-                
-                <div class="row">
-                    <div class="col-md-12">
-                        توضیحات : {{ product_obj.description }}
-                    </div>
-                </div>
-                <div class="row">
-                    <div class="col-md-12">
-                        <div >دسته بندی : {{ product_obj.category.title }} </div>
-                        <button id="{{product_obj.id}}" name="cartbutton" class="cartbutton btn btn-warning">خرید</button>
-                    </div>
-                    
                 </div>
             </div>
         </div>
     </div>
-</body>
+</div>
+{% endblock %}
 
-<script>
-
-console.log(localStorage.getItem('cart'));
-    if(localStorage.getItem('cart')==null){
-        var cart = {};
-    }else{
-        cart = JSON.parse(localStorage.getItem("cart"))
-    }
-    
-    $(document).on('click','.cartbutton',function(){
-        alert("arash")
+{% block extra_js %}
+<script type="text/javascript">
+    $(document).on('click', '.btn-add-to-cart', function() {
         var item_id = this.id.toString();
+        var quantity = parseInt(document.getElementById("quantity").value);
         
-        if(cart[item_id] != undefined){
-            quantity=cart[item_id][0]+1;
-            cart[item_id][0]= quantity
-            cart[item_id][2]= cart[item_id][2] + parseFloat(document.getElementById("price"+item_id).innerHTML);
-
-            
-        }else{
-            quantity=1;
-            name=document.getElementById("nm"+item_id).innerHTML;
-            price=parseFloat(document.getElementById("price"+item_id).innerHTML);
-            cart[item_id]=[quantity,name,price];
-            
-        }
-        
-        console.log(cart)
-        localStorage.setItem('cart',JSON.stringify(cart));
-        
-        document.getElementById("cart").innerHTML="سبد خرید ("+Object.keys(cart).length + ")";
+        $.ajax({
+            url: '/cart/add/' + item_id + '/',
+            method: 'POST',
+            data: {
+                'quantity': quantity,
+                'csrfmiddlewaretoken': '{{ csrf_token }}'
+            },
+            success: function(response) {
+                if (response.status === 'success') {
+                    alert(response.message);
+                    updateCartCount(response.cart_items_count);
+                } else {
+                    alert('خطا در افزودن به سبد خرید');
+                }
+            },
+            error: function() {
+                alert('خطا در ارتباط با سرور');
+            }
+        });
     });
-
+    
+    function updateCartCount(count) {
+        document.getElementById("cart").innerHTML = '<i class="fas fa-shopping-cart"></i> سبد خرید (' + count + ')';
+    }
 </script>
-</html>
+{% endblock %}
