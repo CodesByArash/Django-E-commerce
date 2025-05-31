@@ -18,8 +18,9 @@
     <div class="col-12">
         {%if qs %}
         <div class="card">
-          
-          <!-- /.card-header -->
+          <div class="card-header">
+            <a href="{% url 'shop:seller-product-create' %}" class="btn btn-primary">افزودن محصول جدید</a>
+          </div>
           <div class="card-body table-responsive p-0">
             <table class="table table-hover">
               <thead>
@@ -28,31 +29,31 @@
                   <th>قیمت</th>
                   <th>دسته بندی</th>
                   <th>توضیحات</th>
-                  <th>ویرایش</th>
+                  <th>عملیات</th>
                 </tr>
               </thead>
               <tbody>
                 {% for items in qs %}
                   <tr>                     
-                      <td><a class="btn btn-primary" href="http://127.0.0.1:8000/{{items.id}}/">{{items.title}}</a></td>
+                      <td><a href="{% url 'shop:detail' items.id %}">{{items.title}}</a></td>
                       <td>{{items.price}}</td>
-                      <td>{{items.category}}</td>
-                      <td>{{items.description}}</td>
-                      <td><a class="badge badge-success" href="http://127.0.0.1:8000/account/product/update/{{items.id}}/">ویرایش</a>
-                      {% if user.is_superuser %}
-                      <a class="badge badge-warning" href="http://127.0.0.1:8000/account/product/delete/{{items.id}}/">حذف محصول</a></td>
-                      {% endif %}
+                      <td>{{items.category.all|join:", "}}</td>
+                      <td>{{items.description|truncatewords:20}}</td>
+                      <td>
+                        <a class="btn btn-sm btn-info" href="{% url 'shop:seller-product-update' items.id %}">ویرایش</a>
+                        {% if user.is_superuser %}
+                        <a class="btn btn-sm btn-danger" href="{% url 'shop:seller-product-delete' items.id %}">حذف</a>
+                        {% endif %}
+                      </td>
                   </tr>
                 {%endfor%}
               </tbody>
             </table>
           </div>
-          <!-- /.card-body -->
         </div>
         {% else %}
         <h3>محتوایی برای نمایش وجود ندارد</h3>
         {% endif %}
-      <!-- /.card -->
     </div>
-  </div>
+</div>
 {% endblock %}

@@ -8,10 +8,10 @@ from typing import Any, Dict
 from ..repositories import ProductRepository, CategoryRepository, CartRepository
 from ..models import Product, Category
 from django.http import Http404
+from django.core.paginator import Paginator
 
-class ProductListView(ListView):
-    """View for displaying a list of products."""
-    model = Product
+class IndexView(ListView):
+    """View for displaying all products."""
     template_name = 'shop/index.html'
     context_object_name = 'product_obj'
     paginate_by = 8
@@ -19,52 +19,39 @@ class ProductListView(ListView):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         self.product_repository = ProductRepository()
-        self.category_repository = CategoryRepository()
 
     def get_queryset(self):
-        """Get the list of products based on filters."""
-        category_id = self.request.GET.get('category')
-        search_query = self.request.GET.get('q')
+        """Get products with optional search filter."""
+        search_query = self.request.GET.get('item_name')
+        return self.product_repository.get_all(
+            page=self.request.GET.get('page'),
+            per_page=self.paginate_by,
+            search_query=search_query
+        )
 
-        if category_id:
-            category = self.category_repository.get_by_id(int(category_id))
-            if category:
-                return Product.objects.filter(category=category)
-        elif search_query:
-            return Product.objects.filter(title__icontains=search_query)
-        
-        return Product.objects.all()
-
-    def get_context_data(self, **kwargs) -> Dict[str, Any]:
-        """Add additional context data."""
+    def get_context_data(self, **kwargs):
+        """Add categories to context."""
         context = super().get_context_data(**kwargs)
-        context['categories'] = self.category_repository.get_all()
-        context['category'] = self.request.GET.get('category')
-        context['search_query'] = self.request.GET.get('q', '')
+        context['category'] = self.product_repository.get_all_categories()
         return context
 
 class ProductDetailView(DetailView):
     """View for displaying product details."""
-    model = Product
     template_name = 'shop/detail.html'
     context_object_name = 'product_obj'
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         self.product_repository = ProductRepository()
-        self.category_repository = CategoryRepository()
 
     def get_object(self, queryset=None):
-        """Get the product object."""
-        product = self.product_repository.get_by_id(self.kwargs.get('pk'))
-        if product is None:
-            raise Http404("محصول مورد نظر یافت نشد")
-        return product
+        """Get product by ID."""
+        return self.product_repository.get_by_id(self.kwargs['id'])
 
-    def get_context_data(self, **kwargs) -> Dict[str, Any]:
-        """Add additional context data."""
+    def get_context_data(self, **kwargs):
+        """Add categories to context."""
         context = super().get_context_data(**kwargs)
-        context['categories'] = self.category_repository.get_all()
+        context['category'] = self.product_repository.get_all_categories()
         return context
 
 class AddToCartView(LoginRequiredMixin, DetailView):
@@ -113,26 +100,19 @@ class AddToCartView(LoginRequiredMixin, DetailView):
 
 class CategoryView(ListView):
     """View for displaying products in a category."""
-    model = Product
     template_name = 'shop/category.html'
-    context_object_name = 'product_obj'
-    paginate_by = 8
+    context_object_name = 'products'
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         self.product_repository = ProductRepository()
-        self.category_repository = CategoryRepository()
 
     def get_queryset(self):
-        """Get products in the specified category."""
-        category_slug = self.kwargs.get('slug')
-        category = get_object_or_404(Category, slug=category_slug)
-        return self.product_repository.filter_by_category(category)
+        """Get products in category."""
+        return self.product_repository.get_by_category(self.kwargs['slug'])
 
-    def get_context_data(self, **kwargs) -> Dict[str, Any]:
-        """Add additional context data."""
+    def get_context_data(self, **kwargs):
+        """Add category to context."""
         context = super().get_context_data(**kwargs)
-        category_slug = self.kwargs.get('slug')
-        context['category_obj'] = get_object_or_404(Category, slug=category_slug)
-        context['categories'] = self.category_repository.get_all()
+        context['category'] = get_object_or_404(Category, slug=self.kwargs['slug'], status=True)
         return context 

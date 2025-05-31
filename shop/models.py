@@ -49,10 +49,8 @@ class Product(models.Model):
     thumbnail      = models.ImageField(upload_to='uploads/', blank=True, null=True)
     date_added     = models.DateTimeField(auto_now_add=True)
 
-
-
     def __str__(self):
-        return super().__str__()
+        return self.title
 
     class Meta:
         ordering = ['-date_added',]

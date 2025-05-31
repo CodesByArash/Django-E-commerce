@@ -46,26 +46,18 @@
             </a>
             <ul class="nav nav-treeview">
               <li class="nav-item">
-                <a href="{% url 'account:home'%}" class="nav-link active">
+                <a href="{% url 'shop:orders' %}" class="nav-link active">
                   <i class="far fa-circle nav-icon"></i>
                   <p>{% if request.user.is_active and request.user.is_staff %}
                     سفارشات مشتریان
-               {% else %}
-                   تاریخچه ی سفارشات
-               {% endif %}</p>
+                   {% else %}
+                    تاریخچه ی سفارشات
+                   {% endif %}</p>
                 </a>
               </li>
               {% if request.user.is_active and request.user.is_staff %}
               <li class="nav-item">
-                <a href="./index2.html" class="nav-link">
-                  <i class="far fa-circle nav-icon"></i>
-                  <p>سفارشات شخصی</p>
-                </a>
-              </li>
-              {% endif %}
-              {% if request.user.is_active and request.user.is_staff %}
-              <li class="nav-item">
-                <a href="http://127.0.0.1:8000/account/product/" class="nav-link">
+                <a href="{% url 'account:products' %}" class="nav-link">
                   <i class="far fa-circle nav-icon"></i>
                   <p>لیست تمام محصولات</p>
                 </a>
@@ -73,7 +65,7 @@
               {% endif %}
               {% if request.user.is_active and request.user.is_staff %}
               <li class="nav-item">
-                <a href="http://127.0.0.1:8000/account/product/create/" class="nav-link">
+                <a href="{% url 'account:product-create' %}" class="nav-link">
                   <i class="far fa-circle nav-icon"></i>
                   <p>ساخت محصول جدید</p>
                 </a>
@@ -81,7 +73,7 @@
               {% endif %}
           
           <li class="nav-item">
-            <a href="http://127.0.0.1:8000/account/profile/{{user.id}}/" class="nav-link">
+            <a href="{% url 'account:profile' %}" class="nav-link">
               <i class="nav-icon far fa-edit text-info"></i>
               <p>ویرایش پروفایل</p>
             </a>

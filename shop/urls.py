@@ -13,29 +13,35 @@ Including another URLconf
     1. Import the include() function: from django.urls import include, path
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
-from django.urls import include, re_path
+from django.urls import path
+from django.views.generic import RedirectView
+from .views import (
+    # Product views
+    IndexView, ProductDetailView, CategoryView,
+    # Cart views
+    CheckoutView, AddToCartView, UpdateCartView, RemoveFromCartView, SuccessView,
+    # Order views
+    OrderListView, OrderDetailView,
+)
 
-from django.contrib import admin
-from django.urls import path,include
-from shop import views
-from .views.product_views import ProductListView, ProductDetailView, AddToCartView, CategoryView
-from .views.cart_views import UpdateCartView, RemoveFromCartView, ClearCartView, CheckoutView
-from django.views.generic import TemplateView, RedirectView
+app_name = "shop"
 
-app_name="shop"
 urlpatterns = [
     # Product URLs
-    path('', ProductListView.as_view(), name='index'),
-    path('product/<int:pk>/', ProductDetailView.as_view(), name='detail'),
-    path('cart/add/<int:pk>/', AddToCartView.as_view(), name='add_to_cart'),
+    path('', IndexView.as_view(), name='index'),
+    path('product/<int:id>/', ProductDetailView.as_view(), name='detail'),
     path('category/<slug:slug>/', CategoryView.as_view(), name='category'),
     
-    # Cart URLs - Redirect cart to checkout
+    # Cart URLs
     path('cart/', RedirectView.as_view(pattern_name='shop:checkout', permanent=True), name='cart'),
-    path('cart/update/', UpdateCartView.as_view(), name='update_cart'),
-    path('cart/remove/', RemoveFromCartView.as_view(), name='remove_from_cart'),
-    path('cart/clear/', ClearCartView.as_view(), name='clear_cart'),
+    path('cart/add/<int:product_id>/', AddToCartView.as_view(), name='add_to_cart'),
+    path('cart/update/<int:product_id>/', UpdateCartView.as_view(), name='update_cart'),
+    path('cart/remove/<int:product_id>/', RemoveFromCartView.as_view(), name='remove_from_cart'),
     path('checkout/', CheckoutView.as_view(), name='checkout'),
-    path('success/', TemplateView.as_view(template_name='shop/success.html'), name='success'),
+    path('success/', SuccessView.as_view(), name='success'),
+    
+    # Order URLs
+    path('orders/', OrderListView.as_view(), name='orders'),
+    path('orders/<int:order>/', OrderDetailView.as_view(), name='order-detail'),
 ]
 

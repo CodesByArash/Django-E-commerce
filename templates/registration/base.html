@@ -47,10 +47,13 @@
         <a class="nav-link" data-widget="pushmenu" href="#"><i class="fas fa-bars"></i></a>
       </li>
       <li class="nav-item d-none d-sm-inline-block">
-        <a href="{% url 'account:home' %}" class="nav-link">صفحه ی اصلی</a>
+        <a href="{% url 'account:profile' %}" class="nav-link">صفحه ی اصلی</a>
       </li>
       <li class="nav-item d-none d-sm-inline-block">
-        <a href="{% url 'shop:index'%}" target="_blank" class="nav-link">نمایش سایت</a>
+        <a href="{% url 'shop:index' %}" target="_blank" class="nav-link">نمایش سایت</a>
+      </li>
+      <li class="nav-item d-none d-sm-inline-block">
+        <a href="{% url 'shop:orders' %}" class="nav-link">تاریخچه سفارشات</a>
       </li>
     </ul>
 

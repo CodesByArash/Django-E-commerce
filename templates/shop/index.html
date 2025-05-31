@@ -127,11 +127,11 @@
 {% block extra_js %}
 <script type="text/javascript">
     $(document).on('click', '.cartbutton', function() {
-        var item_id = this.id.toString();
-        var quantity = parseInt(document.getElementById("quantity" + item_id).value);
+        var product_id = this.id.toString();
+        var quantity = parseInt(document.getElementById("quantity" + product_id).value);
         
         $.ajax({
-            url: '/cart/add/' + item_id + '/',
+            url: "/shop/cart/add/" + product_id + "/",
             method: 'POST',
             data: {
                 'quantity': quantity,

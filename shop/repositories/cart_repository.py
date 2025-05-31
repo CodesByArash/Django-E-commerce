@@ -1,10 +1,11 @@
-from typing import Optional, List
+from typing import Optional, List, Tuple
 from django.core.paginator import Paginator
+from django.shortcuts import get_object_or_404
 from .base_repository import BaseRepository
-from shop.models import Cart, CartItem, Product
+from shop.models import Cart, CartItem, Product, Order, OrderDetails
 
 class CartRepository(BaseRepository[Cart]):
-    """Repository for Cart model database operations."""
+    """Repository for Cart and CartItem model database operations."""
 
     def get_by_id(self, cart_id: int) -> Optional[Cart]:
         """Get a cart by its ID."""
@@ -56,68 +57,85 @@ class CartRepository(BaseRepository[Cart]):
         """Filter carts by given criteria."""
         return list(Cart.objects.filter(**kwargs))
 
-    def get_or_create_cart(self, user_id: int) -> Cart:
-        """Get existing active cart for user or create a new one."""
+    def get_active_cart(self, user) -> Optional[Cart]:
+        """Get user's active cart or None if it doesn't exist."""
         try:
-            cart = Cart.objects.get(user_id=user_id, is_active=True)
-            return cart
+            return Cart.objects.get(user=user, is_active=True)
         except Cart.DoesNotExist:
-            # غیرفعال کردن تمام سبدهای خرید قبلی
-            Cart.objects.filter(user_id=user_id).update(is_active=False)
-            # ایجاد سبد خرید جدید
-            return Cart.objects.create(user_id=user_id, is_active=True)
-
-    def add_item(self, cart_id: int, product_id: int, quantity: int = 1) -> Optional[CartItem]:
-        """Add an item to the cart."""
-        try:
-            cart = Cart.objects.get(id=cart_id)
-            product = Product.objects.get(id=product_id)
-            
-            cart_item, created = CartItem.objects.get_or_create(
-                cart=cart,
-                product=product,
-                defaults={
-                    'quantity': quantity,
-                    'price': product.price
-                }
-            )
-            
-            if not created:
-                cart_item.quantity += quantity
-                cart_item.price = product.price  # بروزرسانی قیمت در صورت تغییر
-                cart_item.save()
-            
-            return cart_item
-        except (Cart.DoesNotExist, Product.DoesNotExist):
             return None
 
-    def update_item_quantity(self, cart_id: int, product_id: int, quantity: int) -> Optional[CartItem]:
-        """Update the quantity of an item in the cart."""
-        try:
-            cart_item = CartItem.objects.get(cart_id=cart_id, product_id=product_id)
-            cart_item.quantity = quantity
+    def get_or_create_cart(self, user) -> Cart:
+        """Get user's active cart or create a new one if it doesn't exist."""
+        cart, created = Cart.objects.get_or_create(
+            user=user,
+            is_active=True
+        )
+        return cart
+
+    def add_item(self, cart: Cart, product: Product, quantity: int = 1) -> Tuple[CartItem, bool]:
+        """Add a product to cart or update its quantity if it exists."""
+        cart_item, created = CartItem.objects.get_or_create(
+            cart=cart,
+            product=product,
+            defaults={
+                'quantity': quantity,
+                'price': product.price
+            }
+        )
+        
+        if not created:
+            cart_item.quantity += quantity
             cart_item.save()
-            return cart_item
+            
+        return cart_item, created
+
+    def update_item_quantity(self, cart: Cart, product_id: int, quantity: int) -> Optional[CartItem]:
+        """Update cart item quantity or remove it if quantity is 0."""
+        try:
+            cart_item = CartItem.objects.get(cart=cart, product_id=product_id)
+            if quantity > 0:
+                cart_item.quantity = quantity
+                cart_item.save()
+                return cart_item
+            else:
+                cart_item.delete()
+                return None
         except CartItem.DoesNotExist:
             return None
 
-    def remove_item(self, cart_id: int, product_id: int) -> bool:
-        """Remove an item from the cart."""
-        try:
-            cart_item = CartItem.objects.get(cart_id=cart_id, product_id=product_id)
-            cart_item.delete()
-            return True
-        except CartItem.DoesNotExist:
-            return False
+    def remove_item(self, cart: Cart, product_id: int) -> bool:
+        """Remove an item from cart."""
+        deleted, _ = CartItem.objects.filter(cart=cart, product_id=product_id).delete()
+        return deleted > 0
 
-    def clear_cart(self, cart_id: int) -> bool:
-        """Remove all items from the cart."""
-        try:
-            cart = Cart.objects.get(id=cart_id)
-            cart.items.all().delete()
-            return True
-        except Cart.DoesNotExist:
-            return False
+    def clear_cart(self, cart: Cart) -> None:
+        """Remove all items from cart."""
+        cart.items.all().delete()
+
+    def create_order(self, cart: Cart) -> Order:
+        """Create an order from cart items and clear the cart."""
+        # Create order
+        order = Order.objects.create(
+            costumer=cart.user,
+            total=str(cart.total_price),
+            status='p'  # در حال پردازش
+        )
+        
+        # Create order details
+        for item in cart.items.all():
+            OrderDetails.objects.create(
+                order=order,
+                Item=item.product,
+                quantity=str(item.quantity),
+                price=str(item.price)
+            )
+        
+        # Clear cart
+        self.clear_cart(cart)
+        cart.is_active = False
+        cart.save()
+        
+        return order
 
     def get_cart_total(self, cart_id: int) -> float:
         """Calculate the total price of all items in the cart."""

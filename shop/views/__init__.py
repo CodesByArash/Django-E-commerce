@@ -1,12 +1,20 @@
-from .product_views import ProductListView, ProductDetailView, AddToCartView
-from .cart_views import CartView, UpdateCartView, RemoveFromCartView, ClearCartView
+from django.views.generic import ListView, DetailView, TemplateView
+from django.contrib.auth.mixins import LoginRequiredMixin
+from .product_views import (
+    IndexView, ProductDetailView, CategoryView,
+)
+from .cart_views import (
+    CheckoutView, AddToCartView, UpdateCartView, RemoveFromCartView, SuccessView,
+)
+from .order_views import (
+    OrderListView, OrderDetailView,
+)
 
 __all__ = [
-    'ProductListView',
-    'ProductDetailView',
-    'AddToCartView',
-    'CartView',
-    'UpdateCartView',
-    'RemoveFromCartView',
-    'ClearCartView',
+    # Product views
+    'IndexView', 'ProductDetailView', 'CategoryView',
+    # Cart views
+    'CheckoutView', 'AddToCartView', 'UpdateCartView', 'RemoveFromCartView', 'SuccessView',
+    # Order views
+    'OrderListView', 'OrderDetailView',
 ] 

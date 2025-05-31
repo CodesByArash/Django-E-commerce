@@ -1,0 +1,14 @@
+{% extends 'registration/base.html' %}
+{% load crispy_forms_tags %}
+
+{% block title %}
+ویرایش محصول
+{% endblock %}
+
+{% block main %}
+خوش آمدید {{user.get_full_name}}
+    <form method="post" enctype="multipart/form-data">{% csrf_token %}
+        {{form|crispy}}
+        <button class="btn btn-success">بروزرسانی محصول</button>
+    </form>
+{% endblock %} 

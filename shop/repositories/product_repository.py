@@ -14,10 +14,14 @@ class ProductRepository(BaseRepository[Product]):
         except Product.DoesNotExist:
             return None
 
-    def get_all(self, page: int = None, per_page: int = 8) -> List[Product]:
-        """Get all products, optionally paginated."""
+    def get_all(self, page: int = None, per_page: int = None, search_query: str = None) -> List[Product]:
+        """Get all products, optionally paginated and filtered by search query."""
         products = Product.objects.all()
-        if page is not None:
+        
+        if search_query:
+            products = products.filter(title__icontains=search_query)
+            
+        if page is not None and per_page is not None:
             paginator = Paginator(products, per_page)
             return list(paginator.get_page(page))
         return list(products)
@@ -64,4 +68,16 @@ class ProductRepository(BaseRepository[Product]):
         if page is not None:
             paginator = Paginator(products, per_page)
             return list(paginator.get_page(page))
-        return list(products) 
+        return list(products)
+
+    def get_by_category(self, category_slug: str) -> List[Product]:
+        """Get all products in a category."""
+        try:
+            category = Category.objects.get(slug=category_slug, status=True)
+            return list(Product.objects.filter(category=category))
+        except Category.DoesNotExist:
+            return []
+
+    def get_all_categories(self) -> List[Category]:
+        """Get all active categories."""
+        return list(Category.objects.filter(status=True)) 

@@ -2,14 +2,8 @@
 {% load crispy_forms_tags %}
 
 {% block title %}
-{% if request.user.is_active and request.user.is_staff %}
-{% else %}
 حذف محصول
-{% endif %}
 {% endblock %}
-
-
-
 
 {% block main %}
 خوش آمدید {{user.get_full_name}}
@@ -19,19 +13,11 @@
     <div class="card card-primary">
         <div class="card-header">
             <h3 class="card-title mb-0 float-left">حذف محصول</h3>
-            
         </div>
         <form method="post">{% csrf_token %}
-
             <p>آیا از حذف این محصول اطمینان دارید؟</p>
-            <input class="btn btn-danger" type="submit" value="Confirm">
-        
+            <input class="btn btn-danger" type="submit" value="حذف محصول">
         </form>
     </div>
 </div>
-
-{% endblock %}
-
-
-
-
+{% endblock %} 

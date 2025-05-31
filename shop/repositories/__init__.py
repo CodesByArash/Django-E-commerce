@@ -1,13 +1,9 @@
-from .base_repository import BaseRepository
-from .product_repository import ProductRepository
-from .category_repository import CategoryRepository
 from .cart_repository import CartRepository
-from .user_repository import UserRepository
+from .category_repository import CategoryRepository
+from .product_repository import ProductRepository
 
 __all__ = [
-    'BaseRepository',
-    'ProductRepository',
-    'CategoryRepository',
     'CartRepository',
-    'UserRepository',
+    'CategoryRepository',
+    'ProductRepository',
 ] 

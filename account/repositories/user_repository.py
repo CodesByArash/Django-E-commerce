@@ -1,11 +1,11 @@
 from typing import Optional, List
 from django.contrib.auth import get_user_model
 from django.db.models import QuerySet
-from .base_repository import BaseRepository
+from django.contrib.auth import authenticate
+from django.core.paginator import Paginator
+from ..models import User
 
-User = get_user_model()
-
-class UserRepository(BaseRepository[User]):
+class UserRepository:
     """Repository for User model database operations."""
 
     def get_by_id(self, user_id: int) -> Optional[User]:
@@ -33,7 +33,6 @@ class UserRepository(BaseRepository[User]):
         """Get all users, optionally paginated."""
         users = User.objects.all()
         if page is not None and per_page is not None:
-            from django.core.paginator import Paginator
             paginator = Paginator(users, per_page)
             return list(paginator.get_page(page))
         return list(users)
@@ -71,7 +70,6 @@ class UserRepository(BaseRepository[User]):
 
     def authenticate(self, username: str, password: str) -> Optional[User]:
         """Authenticate a user with username and password."""
-        from django.contrib.auth import authenticate
         return authenticate(username=username, password=password)
 
     def change_password(self, user_id: int, new_password: str) -> bool:

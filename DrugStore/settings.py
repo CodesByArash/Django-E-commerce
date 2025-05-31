@@ -29,7 +29,7 @@ ALLOWED_HOSTS = []
 
 LOGIN_URL = "account:login"
 
-LOGIN_REDIRECT_URL="account:home"
+LOGIN_REDIRECT_URL = "account:profile"
 LOGOUT_REDIRECT_URL="account:login"
 
 
