@@ -1,7 +1,7 @@
 from shop.models import Product
 from django.contrib.auth import views
 from django.urls import path
-from .views import ProductDelete, orderListview,orderDetailView,ProductCreate,ProductUpdate,productlistview,ProductDelete,Profile,signup
+from .views import ProductDelete, orderListview, orderDetailView, ProductCreate, ProductUpdate, productlistview, Profile, signup
 
 app_name = 'account'
 

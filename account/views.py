@@ -4,7 +4,7 @@ from django.shortcuts import redirect, render
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.views.generic import ListView, CreateView,UpdateView,DeleteView
-from shop.models import Product,Order,OrderDetails
+from shop.models import Product, Order, OrderDetails, Cart, CartItem
 from .models import User
 from django.shortcuts import get_object_or_404
 from .mixins import FieldMixins,SuperUserMixin
@@ -14,13 +14,7 @@ from django.contrib.auth import authenticate,login
 import json
 from .forms import SignUpForm
 from django.urls import reverse_lazy
-# Create your views here.
-
-
-# @login_required
-# def home(request):
-#     return render(request,"registration/home.html")
-
+from django.http import JsonResponse
 
 
 class orderListview (LoginRequiredMixin,ListView):
