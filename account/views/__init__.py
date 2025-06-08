@@ -15,6 +15,11 @@ from .product_views import (
     ProductUpdateView,
     ProductDeleteView
 )
+from .order_views import (
+    OrderListView,
+    OrderDetailView,
+    OrderUpdateView,
+)
 
 __all__ = [
     # Auth views
@@ -26,5 +31,9 @@ __all__ = [
     'ProductListView',
     'ProductCreateView',
     'ProductUpdateView',
-    'ProductDeleteView'
+    'ProductDeleteView',
+    # Order views
+    'OrderListView',
+    'OrderDetailView',
+    'OrderUpdateView',
 ] 

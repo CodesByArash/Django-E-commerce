@@ -1,0 +1,99 @@
+{% extends 'Account/base.html' %}
+{% load static %}
+
+{% block title %}
+    {% if request.user.is_staff %}
+        لیست سفارشات
+    {% else %}
+        سفارشات من
+    {% endif %}
+{% endblock %}
+
+{% block main %}
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h3 class="card-title">
+                    {% if request.user.is_staff %}
+                        لیست تمام سفارشات
+                    {% else %}
+                        سفارشات من
+                    {% endif %}
+                </h3>
+            </div>
+            <div class="card-body">
+                {% if orders %}
+                    <div class="table-responsive">
+                        <table class="table table-bordered table-striped">
+                            <thead>
+                                <tr>
+                                    <th>شماره سفارش</th>
+                                    <th>تاریخ ثبت</th>
+                                    <th>وضعیت</th>
+                                    <th>مبلغ کل</th>
+                                    {% if request.user.is_staff %}
+                                        <th>مشتری</th>
+                                    {% endif %}
+                                    <th>عملیات</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for order in orders %}
+                                    <tr>
+                                        <td>#{{ order.id }}</td>
+                                        <td>{{ order.created_at|date:"Y/m/d H:i" }}</td>
+                                        <td>
+                                            {% if order.status == 'pending' %}
+                                                <span class="badge badge-warning">در انتظار پرداخت</span>
+                                            {% elif order.status == 'processing' %}
+                                                <span class="badge badge-info">در حال پردازش</span>
+                                            {% elif order.status == 'shipped' %}
+                                                <span class="badge badge-primary">ارسال شده</span>
+                                            {% elif order.status == 'delivered' %}
+                                                <span class="badge badge-success">تحویل داده شده</span>
+                                            {% elif order.status == 'cancelled' %}
+                                                <span class="badge badge-danger">لغو شده</span>
+                                            {% endif %}
+                                        </td>
+                                        <td>{{ order.get_total_price }} تومان</td>
+                                        {% if request.user.is_staff %}
+                                            <td>{{ order.user.email }}</td>
+                                        {% endif %}
+                                        <td>
+                                            <a href="{% url 'account:order-detail' order.id %}" class="btn btn-info btn-sm">
+                                                <i class="fas fa-eye"></i> مشاهده
+                                            </a>
+                                            {% if request.user.is_staff %} 
+                                                <a href="{% url 'account:order-update' order.id %}" class="btn btn-warning btn-sm">
+                                                    <i class="fas fa-edit"></i> ویرایش
+                                                </a>
+                                            {% endif %}
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                {% else %}
+                    <div class="alert alert-info text-center">
+                        <i class="fas fa-info-circle fa-2x mb-3"></i>
+                        <h4>
+                            {% if request.user.is_staff %}
+                                هنوز هیچ سفارشی ثبت نشده است
+                            {% else %}
+                                شما هنوز سفارشی ثبت نکرده‌اید
+                            {% endif %}
+                        </h4>
+                        {% if not request.user.is_staff %}
+                            <p class="mt-3">
+                                برای ثبت سفارش جدید به <a href="{% url 'shop:index' %}" class="alert-link">فروشگاه</a> مراجعه کنید
+                            </p>
+                        {% endif %}
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

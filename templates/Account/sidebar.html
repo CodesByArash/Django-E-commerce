@@ -46,7 +46,7 @@
             </a>
             <ul class="nav nav-treeview">
               <li class="nav-item">
-                <a href="{% url 'shop:orders' %}" class="nav-link active">
+                <a href="{% url 'account:orders' %}" class="nav-link active">
                   <i class="far fa-circle nav-icon"></i>
                   <p>{% if request.user.is_active and request.user.is_staff %}
                     سفارشات مشتریان

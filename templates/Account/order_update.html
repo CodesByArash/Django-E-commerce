@@ -1,0 +1,97 @@
+{% extends 'Account/base.html' %}
+{% load static %}
+
+{% block title %}
+    ویرایش سفارش #{{ object.id }}
+{% endblock %}
+
+{% block main %}
+<div class="row">
+    <div class="col-md-8 mx-auto">
+        <div class="card">
+            <div class="card-header">
+                <h3 class="card-title">ویرایش سفارش #{{ object.id }}</h3>
+            </div>
+            <div class="card-body">
+                {% if messages %}
+                    {% for message in messages %}
+                        <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                            {{ message }}
+                            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                    {% endfor %}
+                {% endif %}
+
+                <form method="post">
+                    {% csrf_token %}
+                    
+                    <div class="form-group">
+                        <label for="{{ form.status.id_for_label }}">{{ form.status.label }}</label>
+                        {{ form.status }}
+                        {% if form.status.errors %}
+                            <div class="invalid-feedback d-block">
+                                {{ form.status.errors }}
+                            </div>
+                        {% endif %}
+                    </div>
+
+                    <div class="form-group">
+                        <label for="{{ form.tracking_code.id_for_label }}">{{ form.tracking_code.label }}</label>
+                        {{ form.tracking_code }}
+                        {% if form.tracking_code.errors %}
+                            <div class="invalid-feedback d-block">
+                                {{ form.tracking_code.errors }}
+                            </div>
+                        {% endif %}
+                    </div>
+
+                    <div class="form-group">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-save"></i> ذخیره تغییرات
+                        </button>
+                        <a href="{% url 'account:orders' %}" class="btn btn-secondary">
+                            <i class="fas fa-arrow-right"></i> بازگشت به لیست
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <div class="card mt-4">
+            <div class="card-header">
+                <h3 class="card-title">اطلاعات سفارش</h3>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <p><strong>مشتری:</strong> {{ object.user.email }}</p>
+                        <p><strong>تاریخ ثبت:</strong> {{ object.created_at|date:"Y/m/d H:i" }}</p>
+                        <p><strong>مبلغ کل:</strong> {{ object.get_total_price }} تومان</p>
+                    </div>
+                    <div class="col-md-6">
+                        <p><strong>آدرس ارسال:</strong> {{ object.shipping_address }}</p>
+                        <p><strong>وضعیت فعلی:</strong> 
+                            {% if object.status == 'pending' %}
+                                <span class="badge badge-warning">در انتظار پرداخت</span>
+                            {% elif object.status == 'processing' %}
+                                <span class="badge badge-info">در حال پردازش</span>
+                            {% elif object.status == 'shipped' %}
+                                <span class="badge badge-primary">ارسال شده</span>
+                            {% elif object.status == 'delivered' %}
+                                <span class="badge badge-success">تحویل داده شده</span>
+                            {% elif object.status == 'cancelled' %}
+                                <span class="badge badge-danger">لغو شده</span>
+                            {% endif %}
+                        </p>
+                        {% if object.tracking_code %}
+                            <p><strong>کد رهگیری:</strong> {{ object.tracking_code }}</p>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

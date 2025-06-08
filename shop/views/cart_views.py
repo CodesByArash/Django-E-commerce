@@ -150,10 +150,32 @@ class CheckoutView(LoginRequiredMixin, TemplateView):
         if not cart or not cart.items.exists():
             messages.error(request, 'سبد خرید شما خالی است.')
             return redirect('shop:checkout')
+        
+        # Get shipping address from form
+        shipping_address = request.POST.get('address', '').strip()
+        if not shipping_address:
+            messages.error(request, 'لطفا آدرس ارسال را وارد کنید.')
+            return redirect('shop:checkout')
             
-        order = self.cart_repository.create_order(cart)
+        # Create order with shipping address
+        order = self.cart_repository.create_order(cart, shipping_address)
+        messages.success(request, 'سفارش شما با موفقیت ثبت شد.')
         return redirect('shop:success')
 
-class SuccessView(TemplateView):
+class SuccessView(LoginRequiredMixin, TemplateView):
     """View for successful order completion."""
-    template_name = 'shop/success.html' 
+    template_name = 'shop/success.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        # Get the latest order for the current user
+        try:
+            order = Order.objects.filter(user=self.request.user).latest('created_at')
+            context['order'] = order
+            context['order_items'] = order.items.all()
+            context['status_display'] = dict(Order.STATUS_CHOICES)[order.status]
+        except Order.DoesNotExist:
+            context['order'] = None
+            context['order_items'] = []
+            context['status_display'] = None
+        return context 

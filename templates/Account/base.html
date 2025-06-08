@@ -74,7 +74,7 @@
         <a href="{% url 'shop:index' %}" target="_blank" class="nav-link">نمایش سایت</a>
       </li>
       <li class="nav-item d-none d-sm-inline-block">
-        <a href="{% url 'shop:orders' %}" class="nav-link">تاریخچه سفارشات</a>
+        <a href="{% url 'account:orders' %}" class="nav-link">تاریخچه سفارشات</a>
       </li>
     </ul>
 
@@ -83,9 +83,12 @@
       <!-- Messages Dropdown Menu -->
 
       <li class="nav- ">
-        <a class="nav-link" data-widget="control-sidebar" data-slide="true" href="{% url 'account:logout' %}">
-          <i class="fas fa-sign-out-alt"></i>
-        </a>
+        <form method="post" action="{% url 'account:logout' %}" style="display: inline;">
+          {% csrf_token %}
+          <button type="submit" class="nav-link btn btn-link" style="background: none; border: none; padding: 0;">
+            <i class="fas fa-sign-out-alt"></i>
+          </button>
+        </form>
       </li>
     </ul>
   </nav>
@@ -93,7 +96,7 @@
 
   <!-- Main Sidebar Container -->
   
-  {% include 'registration/sidebar.html' %}
+  {% include 'Account/sidebar.html' %}
 
   <!-- Content Wrapper. Contains page content -->
   <div class="content-wrapper">

@@ -1,0 +1,136 @@
+{% extends 'Account/base.html' %}
+{% load static %}
+
+{% block title %}
+    جزئیات سفارش #{{ order.id }}
+{% endblock %}
+
+{% block main %}
+<div class="row">
+    <div class="col-md-8 mx-auto">
+        <!-- اطلاعات کلی سفارش -->
+        <div class="card">
+            <div class="card-header">
+                <h3 class="card-title">اطلاعات سفارش #{{ order.id }}</h3>
+                {% if request.user.is_staff %}
+                <div class="card-tools">
+                    <a href="{% url 'account:order-update' order.id %}" class="btn btn-warning btn-sm">
+                        <i class="fas fa-edit"></i> ویرایش سفارش
+                    </a>
+                </div>
+                {% endif %}
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <p><strong>مشتری:</strong> {{ order.user.email }}</p>
+                        <p><strong>تاریخ ثبت:</strong> {{ order.created_at|date:"Y/m/d H:i" }}</p>
+                        <p><strong>آخرین بروزرسانی:</strong> {{ order.updated_at|date:"Y/m/d H:i" }}</p>
+                        <p><strong>مبلغ کل:</strong> {{ order.get_total_price }} تومان</p>
+                    </div>
+                    <div class="col-md-6">
+                        <p><strong>وضعیت سفارش:</strong> 
+                            {% if order.status == 'pending' %}
+                                <span class="badge badge-warning">در انتظار پرداخت</span>
+                            {% elif order.status == 'processing' %}
+                                <span class="badge badge-info">در حال پردازش</span>
+                            {% elif order.status == 'shipped' %}
+                                <span class="badge badge-primary">ارسال شده</span>
+                            {% elif order.status == 'delivered' %}
+                                <span class="badge badge-success">تحویل داده شده</span>
+                            {% elif order.status == 'cancelled' %}
+                                <span class="badge badge-danger">لغو شده</span>
+                            {% endif %}
+                        </p>
+                        {% if order.tracking_code %}
+                            <p><strong>کد رهگیری:</strong> {{ order.tracking_code }}</p>
+                        {% endif %}
+                        <p><strong>تعداد کل اقلام:</strong> {{ order.total_items }} عدد</p>
+                    </div>
+                </div>
+                <div class="row mt-3">
+                    <div class="col-12">
+                        <p><strong>آدرس ارسال:</strong></p>
+                        <div class="alert alert-info">
+                            {{ order.shipping_address }}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- لیست اقلام سفارش -->
+        <div class="card mt-4">
+            <div class="card-header">
+                <h3 class="card-title">اقلام سفارش</h3>
+            </div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-striped">
+                        <thead>
+                            <tr>
+                                <th>تصویر</th>
+                                <th>نام محصول</th>
+                                <th>قیمت واحد</th>
+                                <th>تعداد</th>
+                                <th>قیمت کل</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for item in order_details %}
+                            <tr>
+                                <td>
+                                    {% if item.product.thumbnail %}
+                                        <img src="{{ item.product.get_thumbnail }}" alt="{{ item.product.title }}" style="width: 50px; height: 50px; object-fit: cover;">
+                                    {% else %}
+                                        <div class="bg-light text-center" style="width: 50px; height: 50px; line-height: 50px;">
+                                            <i class="fas fa-image text-muted"></i>
+                                        </div>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    <a href="{{ item.product.get_absolute_url }}" target="_blank">
+                                        {{ item.product.title }}
+                                    </a>
+                                </td>
+                                <td>{{ item.price }} تومان</td>
+                                <td>{{ item.quantity }} عدد</td>
+                                <td>{{ item.total_price }} تومان</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                        <tfoot>
+                            <tr>
+                                <td colspan="4" class="text-left"><strong>جمع کل:</strong></td>
+                                <td><strong>{{ order.get_total_price }} تومان</strong></td>
+                            </tr>
+                        </tfoot>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- دکمه بازگشت -->
+        <div class="text-center mt-4">
+            <a href="{% url 'account:orders' %}" class="btn btn-secondary">
+                <i class="fas fa-arrow-right"></i> بازگشت به لیست سفارش‌ها
+            </a>
+        </div>
+    </div>
+</div>
+
+<style>
+.table td, .table th {
+    vertical-align: middle;
+}
+.badge {
+    font-size: 0.9rem;
+    padding: 0.5em 0.8em;
+}
+.alert-info {
+    background-color: #f8f9fa;
+    border-color: #e9ecef;
+    color: #495057;
+}
+</style>
+{% endblock %} 

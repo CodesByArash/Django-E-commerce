@@ -6,15 +6,12 @@ from .product_views import (
 from .cart_views import (
     CheckoutView, AddToCartView, UpdateCartView, RemoveFromCartView, SuccessView,
 )
-from .order_views import (
-    OrderListView, OrderDetailView,
-)
+
 
 __all__ = [
     # Product views
     'IndexView', 'ProductDetailView', 'CategoryView',
     # Cart views
     'CheckoutView', 'AddToCartView', 'UpdateCartView', 'RemoveFromCartView', 'SuccessView',
-    # Order views
-    'OrderListView', 'OrderDetailView',
 ] 
+

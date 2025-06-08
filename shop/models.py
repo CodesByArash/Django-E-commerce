@@ -248,7 +248,7 @@ class Order(models.Model):
         ordering = ['-created_at']
 
     def __str__(self):
-        return f'سفارش {self.user.get_full_name()} - {self.created_at.strftime("%Y-%m-%d")}'
+        return f'سفارش {self.user.email} - {self.created_at.strftime("%Y-%m-%d")}'
 
     @property
     def total_items(self):

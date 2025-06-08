@@ -112,18 +112,25 @@ class CartRepository(BaseRepository[Cart]):
         """Remove all items from cart."""
         cart.items.all().delete()
 
-    def create_order(self, cart: Cart) -> Order:
+    def create_order(self, cart: Cart, shipping_address: str) -> Order:
         """Create an order from cart items and clear the cart."""
+        print(f"Debug - Creating order for user: {cart.user.email}")
+        print(f"Debug - Cart total price: {cart.total_price}")
+        print(f"Debug - Cart items count: {cart.items.count()}")
+        
         # Create order
         order = Order.objects.create(
             user=cart.user,
             total_price=cart.total_price,
             status='processing',  # در حال پردازش
-            shipping_address=''
+            shipping_address=shipping_address
         )
+        print(f"Debug - Order created with ID: {order.id}")
         
         # Create order items
         for item in cart.items.all():
+            print(f"Debug - Creating order item for product: {item.product.title}")
+            print(f"Debug - Quantity: {item.quantity}, Price: {item.price}")
             OrderItem.objects.create(
                 order=order,
                 product=item.product,
@@ -136,6 +143,7 @@ class CartRepository(BaseRepository[Cart]):
         cart.is_active = False
         cart.save()
         
+        print(f"Debug - Order creation completed. Order ID: {order.id}")
         return order
 
     def get_cart_total(self, cart_id: int) -> float:

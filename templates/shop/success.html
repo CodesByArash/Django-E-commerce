@@ -5,6 +5,105 @@
 
 {% block extra_css %}
 <link rel="stylesheet" href="{% static 'shop/success.css' %}">
+<style>
+    .success-container {
+        max-width: 800px;
+        margin: 2rem auto;
+    }
+    .success-card {
+        background: #fff;
+        border-radius: 8px;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        padding: 2rem;
+        text-align: center;
+    }
+    .success-icon {
+        color: #28a745;
+        font-size: 4rem;
+        margin-bottom: 1rem;
+    }
+    .success-title {
+        color: #28a745;
+        margin-bottom: 1.5rem;
+    }
+    .success-message {
+        margin-bottom: 2rem;
+        line-height: 1.6;
+    }
+    .order-details {
+        background: #f8f9fa;
+        border-radius: 8px;
+        padding: 1.5rem;
+        margin: 1.5rem 0;
+        text-align: right;
+    }
+    .order-details h3 {
+        color: #495057;
+        margin-bottom: 1rem;
+        font-size: 1.2rem;
+    }
+    .order-info {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 1rem;
+        margin-bottom: 1rem;
+    }
+    .info-item {
+        background: #fff;
+        padding: 0.75rem;
+        border-radius: 4px;
+        border: 1px solid #dee2e6;
+    }
+    .info-label {
+        color: #6c757d;
+        font-size: 0.9rem;
+        margin-bottom: 0.25rem;
+    }
+    .info-value {
+        color: #212529;
+        font-weight: 500;
+    }
+    .order-items {
+        margin-top: 1.5rem;
+    }
+    .order-items table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+    .order-items th {
+        background: #e9ecef;
+        padding: 0.75rem;
+        text-align: right;
+        font-weight: 500;
+        color: #495057;
+    }
+    .order-items td {
+        padding: 0.75rem;
+        border-bottom: 1px solid #dee2e6;
+        vertical-align: middle;
+    }
+    .order-items img {
+        width: 50px;
+        height: 50px;
+        object-fit: cover;
+        border-radius: 4px;
+    }
+    .status-badge {
+        display: inline-block;
+        padding: 0.35rem 0.75rem;
+        border-radius: 20px;
+        font-size: 0.85rem;
+        font-weight: 500;
+    }
+    .status-pending { background: #fff3cd; color: #856404; }
+    .status-processing { background: #cce5ff; color: #004085; }
+    .status-shipped { background: #d4edda; color: #155724; }
+    .status-delivered { background: #d1e7dd; color: #0f5132; }
+    .status-cancelled { background: #f8d7da; color: #721c24; }
+    .btn-home {
+        margin-top: 1rem;
+    }
+</style>
 {% endblock %}
 
 {% block content %}
@@ -12,11 +111,87 @@
     <div class="success-card">
         <i class="fas fa-check-circle success-icon"></i>
         <h1 class="success-title">سفارش شما با موفقیت ثبت شد</h1>
-        <p class="success-message">
-            سفارش شما با موفقیت ثبت شد و در حال پردازش است.<br>
-            جزئیات سفارش به ایمیل شما ارسال خواهد شد.<br>
-            شماره سفارش: <strong>{{ order.id }}</strong>
-        </p>
+        
+        {% if order %}
+            <div class="order-details">
+                <h3>اطلاعات سفارش</h3>
+                <div class="order-info">
+                    <div class="info-item">
+                        <div class="info-label">شماره سفارش</div>
+                        <div class="info-value">{{ order.id }}</div>
+                    </div>
+                    <div class="info-item">
+                        <div class="info-label">تاریخ ثبت</div>
+                        <div class="info-value">{{ order.created_at|date:"Y/m/d H:i" }}</div>
+                    </div>
+                    <div class="info-item">
+                        <div class="info-label">وضعیت سفارش</div>
+                        <div class="info-value">
+                            <span class="status-badge status-{{ order.status }}">{{ status_display }}</span>
+                        </div>
+                    </div>
+                    {% if order.tracking_code %}
+                    <div class="info-item">
+                        <div class="info-label">کد رهگیری</div>
+                        <div class="info-value">{{ order.tracking_code }}</div>
+                    </div>
+                    {% endif %}
+                    <div class="info-item">
+                        <div class="info-label">قیمت کل</div>
+                        <div class="info-value">{{ order.total_price|floatformat:0 }} تومان</div>
+                    </div>
+                    <div class="info-item">
+                        <div class="info-label">تعداد اقلام</div>
+                        <div class="info-value">{{ order.total_items }} عدد</div>
+                    </div>
+                </div>
+
+                <div class="order-items">
+                    <h3>اقلام سفارش</h3>
+                    <div class="table-responsive">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>تصویر</th>
+                                    <th>نام محصول</th>
+                                    <th>قیمت واحد</th>
+                                    <th>تعداد</th>
+                                    <th>قیمت کل</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for item in order_items %}
+                                <tr>
+                                    <td>
+                                        {% if item.product.image %}
+                                            <img src="{{ item.product.image.url }}" alt="{{ item.product.title }}">
+                                        {% else %}
+                                            <img src="{% static 'shop/images/no-image.png' %}" alt="بدون تصویر">
+                                        {% endif %}
+                                    </td>
+                                    <td>{{ item.product.title }}</td>
+                                    <td>{{ item.price|floatformat:0 }} تومان</td>
+                                    <td>{{ item.quantity }} عدد</td>
+                                    <td>{{ item.total_price|floatformat:0 }} تومان</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="info-item mt-3">
+                    <div class="info-label">آدرس ارسال</div>
+                    <div class="info-value">{{ order.shipping_address }}</div>
+                </div>
+            </div>
+        {% else %}
+            <p class="success-message">
+                متأسفانه اطلاعات سفارش در دسترس نیست.<br>
+                لطفاً با پشتیبانی تماس بگیرید.
+            </p>
+        {% endif %}
+
         <a href="{% url 'shop:index' %}" class="btn btn-success btn-home">
             <i class="fas fa-home"></i>
             بازگشت به فروشگاه

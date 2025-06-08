@@ -7,7 +7,7 @@ from account.forms import UserRegistrationForm, UserUpdateForm
 
 class RegisterView(CreateView):
     """View for user registration."""
-    template_name = 'registration/signup.html'
+    template_name = 'Account/signup.html'
     form_class = UserRegistrationForm
     success_url = reverse_lazy('account:profile')
 
@@ -19,16 +19,17 @@ class RegisterView(CreateView):
 
 class CustomLoginView(LoginView):
     """View for user login."""
-    template_name = 'registration/login.html'
+    template_name = 'Account/login.html'
     success_url = reverse_lazy('shop:index')
 
 class CustomLogoutView(LogoutView):
     """View for user logout."""
     next_page = reverse_lazy('shop:index')
+    http_method_names = ['get', 'post']  # Allow both GET and POST methods
 
 class ProfileView(LoginRequiredMixin, UpdateView):
     """View for user profile."""
-    template_name = 'registration/profile.html'
+    template_name = 'Account/profile.html'
     form_class = UserUpdateForm
     success_url = reverse_lazy('account:profile')
 

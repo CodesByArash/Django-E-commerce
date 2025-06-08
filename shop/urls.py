@@ -20,8 +20,6 @@ from .views import (
     IndexView, ProductDetailView, CategoryView,
     # Cart views
     CheckoutView, AddToCartView, UpdateCartView, RemoveFromCartView, SuccessView,
-    # Order views
-    OrderListView, OrderDetailView,
 )
 
 app_name = "shop"
@@ -38,9 +36,5 @@ urlpatterns = [
     path('cart/remove/<int:product_id>/', RemoveFromCartView.as_view(), name='remove_from_cart'),
     path('checkout/', CheckoutView.as_view(), name='checkout'),
     path('success/', SuccessView.as_view(), name='success'),
-    
-    # Order URLs
-    path('orders/', OrderListView.as_view(), name='orders'),
-    path('orders/<int:order>/', OrderDetailView.as_view(), name='order-detail'),
-]
+    ]
 
