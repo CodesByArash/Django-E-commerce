@@ -69,10 +69,15 @@ class UpdateCartView(LoginRequiredMixin, View):
     def post(self, request, product_id):
         """Update cart item quantity."""
         try:
+            print(f"Debug - Received POST request for product {product_id}")
+            print(f"Debug - POST data: {request.POST}")
+            
             cart = self.cart_repository.get_or_create_cart(request.user)
             quantity = int(request.POST.get('quantity', 0))
+            print(f"Debug - Parsed quantity: {quantity}")
             
             if quantity <= 0:
+                print(f"Debug - Quantity <= 0, removing item")
                 if self.cart_repository.remove_item(cart, product_id):
                     messages.success(request, 'محصول از سبد خرید حذف شد.')
                 else:
@@ -80,11 +85,13 @@ class UpdateCartView(LoginRequiredMixin, View):
                 return redirect('shop:checkout')
             
             product = get_object_or_404(Product, id=product_id)
-            if quantity > product.stock:
+            print(f"Debug - Product quantity: {product.quantity}")
+            if quantity > product.quantity:
                 messages.error(request, 'موجودی کافی نیست.')
                 return redirect('shop:checkout')
             
             cart_item = self.cart_repository.update_item_quantity(cart, product_id, quantity)
+            print(f"Debug - Updated cart item: {cart_item}")
             if cart_item:
                 messages.success(request, 'سبد خرید بروزرسانی شد.')
             else:
@@ -93,6 +100,7 @@ class UpdateCartView(LoginRequiredMixin, View):
             return redirect('shop:checkout')
             
         except Exception as e:
+            print(f"Debug - Error occurred: {str(e)}")
             messages.error(request, f'خطای سیستمی: {str(e)}')
             return redirect('shop:checkout')
 
@@ -125,17 +133,23 @@ class CheckoutView(LoginRequiredMixin, TemplateView):
         """Get cart items and total for checkout."""
         context = super().get_context_data(**kwargs)
         cart = self.cart_repository.get_active_cart(self.request.user)
-        if not cart:
-            return redirect('shop:index')
+        
+        if cart and cart.items.exists():
+            context['cart_items'] = cart.items.all()
+            context['total'] = cart.total_price
+            context['is_empty'] = False
+        else:
+            context['cart_items'] = []
+            context['total'] = 0
+            context['is_empty'] = True
             
-        context['cart_items'] = cart.items.all()
-        context['total'] = cart.total_price
         return context
 
     def post(self, request, *args, **kwargs):
         cart = self.cart_repository.get_active_cart(request.user)
-        if not cart:
-            return redirect('shop:index')
+        if not cart or not cart.items.exists():
+            messages.error(request, 'سبد خرید شما خالی است.')
+            return redirect('shop:checkout')
             
         order = self.cart_repository.create_order(cart)
         return redirect('shop:success')
