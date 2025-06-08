@@ -239,7 +239,14 @@ class Order(models.Model):
         max_length=50,
         blank=True,
         null=True,
-        verbose_name='کد رهگیری'
+        verbose_name='کد رهگیری پستی'
+    )
+    tracking_number = models.CharField(
+        max_length=20,
+        unique=True,
+        blank=True,
+        null=True,
+        verbose_name='کد پیگیری'
     )
 
     class Meta:
@@ -249,6 +256,34 @@ class Order(models.Model):
 
     def __str__(self):
         return f'سفارش {self.user.email} - {self.created_at.strftime("%Y-%m-%d")}'
+
+    def save(self, *args, **kwargs):
+        if not self.tracking_number:
+            self.tracking_number = self.generate_tracking_number()
+        super().save(*args, **kwargs)
+
+    def generate_tracking_number(self):
+        """Generate a unique tracking number for the order."""
+        import random
+        import string
+        from datetime import datetime
+        
+        # Get current date components
+        now = datetime.now()
+        date_part = now.strftime('%y%m%d')  # YYMMDD format
+        
+        # Generate random part (4 characters)
+        random_part = ''.join(random.choices(string.ascii_uppercase + string.digits, k=4))
+        
+        # Combine date and random parts
+        tracking_number = f'ORD-{date_part}-{random_part}'
+        
+        # Check if this tracking number already exists
+        while Order.objects.filter(tracking_number=tracking_number).exists():
+            random_part = ''.join(random.choices(string.ascii_uppercase + string.digits, k=4))
+            tracking_number = f'ORD-{date_part}-{random_part}'
+        
+        return tracking_number
 
     @property
     def total_items(self):

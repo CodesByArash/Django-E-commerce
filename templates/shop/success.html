@@ -121,6 +121,10 @@
                         <div class="info-value">{{ order.id }}</div>
                     </div>
                     <div class="info-item">
+                        <div class="info-label">کد پیگیری</div>
+                        <div class="info-value">{{ order.tracking_number }}</div>
+                    </div>
+                    <div class="info-item">
                         <div class="info-label">تاریخ ثبت</div>
                         <div class="info-value">{{ order.created_at|date:"Y/m/d H:i" }}</div>
                     </div>
@@ -132,7 +136,7 @@
                     </div>
                     {% if order.tracking_code %}
                     <div class="info-item">
-                        <div class="info-label">کد رهگیری</div>
+                        <div class="info-label">کد رهگیری پستی</div>
                         <div class="info-value">{{ order.tracking_code }}</div>
                     </div>
                     {% endif %}

@@ -4,6 +4,7 @@ from django.shortcuts import redirect, render, get_object_or_404
 from django.urls import reverse_lazy
 from django.contrib import messages
 from django.http import JsonResponse
+from django.db import transaction
 from typing import Any, Dict
 from ..repositories import CartRepository, ProductRepository
 from ..models import Cart, CartItem, Order, OrderItem
@@ -40,23 +41,26 @@ class AddToCartView(LoginRequiredMixin, View):
 
     def post(self, request, product_id):
         try:
-            cart = self.cart_repository.get_or_create_cart(request.user)
-            product = get_object_or_404(Product, id=product_id)
-            quantity = int(request.POST.get('quantity', 1))
-            
-            if quantity <= 0:
-                messages.error(request, 'تعداد باید بیشتر از صفر باشد.')
-                return redirect('shop:detail', id=product_id)
-            
-            if quantity > product.quantity:
-                messages.error(request, 'موجودی کافی نیست.')
-                return redirect('shop:detail', id=product_id)
-            
-            cart_item, created = self.cart_repository.add_item(cart, product, quantity)
-            
-            messages.success(request, 'محصول به سبد خرید اضافه شد')
-            return redirect('shop:checkout')
-            
+            with transaction.atomic():
+                cart = self.cart_repository.get_or_create_cart(request.user)
+                quantity = int(request.POST.get('quantity', 1))
+                
+                if quantity <= 0:
+                    messages.error(request, 'تعداد باید بیشتر از صفر باشد.')
+                    return redirect('shop:detail', id=product_id)
+                
+                # Lock the product to check quantity
+                product = Product.objects.select_for_update().get(id=product_id)
+                
+                if quantity > product.quantity:
+                    messages.error(request, 'موجودی کافی نیست.')
+                    return redirect('shop:detail', id=product_id)
+                
+                cart_item, created = self.cart_repository.add_item(cart, product, quantity)
+                
+                messages.success(request, 'محصول به سبد خرید اضافه شد')
+                return redirect('shop:checkout')
+                
         except Exception as e:
             messages.error(request, f'خطای سیستمی: {str(e)}')
             return redirect('shop:detail', id=product_id)
@@ -67,31 +71,24 @@ class UpdateCartView(LoginRequiredMixin, View):
         self.cart_repository = CartRepository()
 
     def post(self, request, product_id):
-        """Update cart item quantity."""
         try:
-            print(f"Debug - Received POST request for product {product_id}")
-            print(f"Debug - POST data: {request.POST}")
-            
             cart = self.cart_repository.get_or_create_cart(request.user)
             quantity = int(request.POST.get('quantity', 0))
-            print(f"Debug - Parsed quantity: {quantity}")
             
             if quantity <= 0:
-                print(f"Debug - Quantity <= 0, removing item")
                 if self.cart_repository.remove_item(cart, product_id):
                     messages.success(request, 'محصول از سبد خرید حذف شد.')
                 else:
                     messages.error(request, 'خطا در حذف محصول از سبد خرید.')
                 return redirect('shop:checkout')
             
-            product = get_object_or_404(Product, id=product_id)
-            print(f"Debug - Product quantity: {product.quantity}")
+            product = Product.objects.select_for_update().get(id=product_id)
+            
             if quantity > product.quantity:
                 messages.error(request, 'موجودی کافی نیست.')
                 return redirect('shop:checkout')
             
             cart_item = self.cart_repository.update_item_quantity(cart, product_id, quantity)
-            print(f"Debug - Updated cart item: {cart_item}")
             if cart_item:
                 messages.success(request, 'سبد خرید بروزرسانی شد.')
             else:
@@ -100,7 +97,6 @@ class UpdateCartView(LoginRequiredMixin, View):
             return redirect('shop:checkout')
             
         except Exception as e:
-            print(f"Debug - Error occurred: {str(e)}")
             messages.error(request, f'خطای سیستمی: {str(e)}')
             return redirect('shop:checkout')
 
@@ -151,19 +147,23 @@ class CheckoutView(LoginRequiredMixin, TemplateView):
             messages.error(request, 'سبد خرید شما خالی است.')
             return redirect('shop:checkout')
         
-        # Get shipping address from form
         shipping_address = request.POST.get('address', '').strip()
         if not shipping_address:
             messages.error(request, 'لطفا آدرس ارسال را وارد کنید.')
             return redirect('shop:checkout')
             
-        # Create order with shipping address
-        order = self.cart_repository.create_order(cart, shipping_address)
-        messages.success(request, 'سفارش شما با موفقیت ثبت شد.')
-        return redirect('shop:success')
+        try:
+            order = self.cart_repository.create_order(cart, shipping_address)
+            messages.success(request, 'سفارش شما با موفقیت ثبت شد.')
+            return redirect('shop:success')
+        except ValueError as e:
+            messages.error(request, f'خطا در ثبت سفارش: {str(e)}')
+            return redirect('shop:checkout')
+        except Exception as e:
+            messages.error(request, 'خطای سیستمی در ثبت سفارش. لطفاً دوباره تلاش کنید.')
+            return redirect('shop:checkout')
 
 class SuccessView(LoginRequiredMixin, TemplateView):
-    """View for successful order completion."""
     template_name = 'shop/success.html'
 
     def get_context_data(self, **kwargs):

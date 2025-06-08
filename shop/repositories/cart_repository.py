@@ -1,6 +1,7 @@
 from typing import Optional, List, Tuple
 from django.core.paginator import Paginator
 from django.shortcuts import get_object_or_404
+from django.db import transaction
 from .base_repository import BaseRepository
 from shop.models import Cart, CartItem, Product, Order, OrderItem
 
@@ -72,21 +73,24 @@ class CartRepository(BaseRepository[Cart]):
         )
         return cart
 
-    def add_item(self, cart: Cart, product: Product, quantity: int = 1) -> Tuple[CartItem, bool]:
-        """Add a product to cart or update its quantity if it exists."""
+    def add_item(self, cart: Cart, product: Product, quantity: int) -> Tuple[CartItem, bool]:
+        """Add an item to cart."""
+        # Lock the product to check quantity
+        product = Product.objects.select_for_update().get(id=product.id)
+        
+        if quantity > product.quantity:
+            raise ValueError(f"Insufficient quantity for product: {product.title}")
+        
         cart_item, created = CartItem.objects.get_or_create(
             cart=cart,
             product=product,
-            defaults={
-                'quantity': quantity,
-                'price': product.price
-            }
+            defaults={'quantity': quantity, 'price': product.price}
         )
         
         if not created:
             cart_item.quantity += quantity
             cart_item.save()
-            
+        
         return cart_item, created
 
     def update_item_quantity(self, cart: Cart, product_id: int, quantity: int) -> Optional[CartItem]:
@@ -114,40 +118,52 @@ class CartRepository(BaseRepository[Cart]):
 
     def create_order(self, cart: Cart, shipping_address: str) -> Order:
         """Create an order from cart items and clear the cart."""
-        print(f"Debug - Creating order for user: {cart.user.email}")
-        print(f"Debug - Cart total price: {cart.total_price}")
-        print(f"Debug - Cart items count: {cart.items.count()}")
-        
-        # Create order
-        order = Order.objects.create(
-            user=cart.user,
-            total_price=cart.total_price,
-            status='processing',  # در حال پردازش
-            shipping_address=shipping_address
-        )
-        print(f"Debug - Order created with ID: {order.id}")
-        
-        # Create order items
-        for item in cart.items.all():
-            print(f"Debug - Creating order item for product: {item.product.title}")
-            print(f"Debug - Quantity: {item.quantity}, Price: {item.price}")
-            OrderItem.objects.create(
-                order=order,
-                product=item.product,
-                quantity=item.quantity,
-                price=item.price
+        with transaction.atomic():
+            # Lock the cart to prevent concurrent modifications
+            cart = Cart.objects.select_for_update().get(id=cart.id)
+            
+            # Check if cart is still active and has items
+            if not cart.is_active or not cart.items.exists():
+                raise ValueError("Cart is empty or inactive")
+            
+            # Check product quantities before creating order
+            for item in cart.items.all():
+                product = Product.objects.select_for_update().get(id=item.product.id)
+                if product.quantity < item.quantity:
+                    raise ValueError(f"Insufficient quantity for product: {product.title}")
+            
+            # Create order
+            order = Order.objects.create(
+                user=cart.user,
+                total_price=cart.total_price,
+                status='processing',
+                shipping_address=shipping_address
             )
-        
-        # Clear cart
-        self.clear_cart(cart)
-        cart.is_active = False
-        cart.save()
-        
-        print(f"Debug - Order creation completed. Order ID: {order.id}")
-        return order
+            
+            # Create order items and update product quantities
+            for item in cart.items.all():
+                product = Product.objects.select_for_update().get(id=item.product.id)
+                
+                # Create order item
+                OrderItem.objects.create(
+                    order=order,
+                    product=product,
+                    quantity=item.quantity,
+                    price=item.price
+                )
+                
+                # Update product quantity
+                product.quantity -= item.quantity
+                product.save()
+            
+            # Clear cart
+            self.clear_cart(cart)
+            cart.is_active = False
+            cart.save()
+            
+            return order
 
     def get_cart_total(self, cart_id: int) -> float:
-        """Calculate the total price of all items in the cart."""
         try:
             cart = Cart.objects.get(id=cart_id)
             return sum(item.total_price for item in cart.items.all())

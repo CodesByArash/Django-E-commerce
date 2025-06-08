@@ -32,55 +32,42 @@
         <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false">
           <!-- Add icons to the links using the .nav-icon class
                with font-awesome or any other icon font library -->
-          <li class="nav-item has-treeview menu-open">
-            <a href="#" class="nav-link active">
-              <i class="nav-icon fas fa-tachometer-alt"></i>
-              <p>
-                {% if request.user.is_active and request.user.is_staff %}
-                 مدیریت سفارشات مشتریان
-            {% else %}
+          <li class="nav-item">
+            <a href="{% url 'account:orders' %}" class="nav-link {% if request.resolver_match.url_name == 'orders' %}active bg-info{% endif %}">
+              <i class="nav-icon fas fa-shopping-cart"></i>
+              <p>{% if request.user.is_active and request.user.is_staff %}
+                سفارشات مشتریان
+               {% else %}
                 تاریخچه ی سفارشات
-            {% endif %}
-                <i class="right fas fa-angle-left"></i>
-              </p>
+               {% endif %}</p>
             </a>
-            <ul class="nav nav-treeview">
-              <li class="nav-item">
-                <a href="{% url 'account:orders' %}" class="nav-link active">
-                  <i class="far fa-circle nav-icon"></i>
-                  <p>{% if request.user.is_active and request.user.is_staff %}
-                    سفارشات مشتریان
-                   {% else %}
-                    تاریخچه ی سفارشات
-                   {% endif %}</p>
-                </a>
-              </li>
-              {% if request.user.is_active and request.user.is_staff %}
-              <li class="nav-item">
-                <a href="{% url 'account:products' %}" class="nav-link">
-                  <i class="far fa-circle nav-icon"></i>
-                  <p>لیست تمام محصولات</p>
-                </a>
-              </li>
-              {% endif %}
-              {% if request.user.is_active and request.user.is_staff %}
-              <li class="nav-item">
-                <a href="{% url 'account:product-create' %}" class="nav-link">
-                  <i class="far fa-circle nav-icon"></i>
-                  <p>ساخت محصول جدید</p>
-                </a>
-              </li>
-              {% endif %}
+          </li>
+          {% if request.user.is_active and request.user.is_staff %}
+          <li class="nav-item">
+            <a href="{% url 'account:products' %}" class="nav-link {% if request.resolver_match.url_name == 'products' %}active bg-info{% endif %}">
+              <i class="nav-icon fas fa-box"></i>
+              <p>لیست تمام محصولات</p>
+            </a>
+          </li>
+          {% endif %}
+          {% if request.user.is_active and request.user.is_staff %}
+          <li class="nav-item">
+            <a href="{% url 'account:product-create' %}" class="nav-link {% if request.resolver_match.url_name == 'product-create' %}active bg-info{% endif %}">
+              <i class="nav-icon fas fa-plus-circle"></i>
+              <p>ساخت محصول جدید</p>
+            </a>
+          </li>
+          {% endif %}
           
           <li class="nav-item">
-            <a href="{% url 'account:profile' %}" class="nav-link">
-              <i class="nav-icon far fa-edit text-info"></i>
+            <a href="{% url 'account:profile' %}" class="nav-link {% if request.resolver_match.url_name == 'profile' %}active bg-info{% endif %}">
+              <i class="nav-icon far fa-user"></i>
               <p>ویرایش پروفایل</p>
             </a>
           </li>
           <li class="nav-item">
-            <a href="{% url 'shop:checkout' %}" class="nav-link">
-              <i class="nav-icon fas fa-shopping-basket text-info"></i>
+            <a href="{% url 'shop:checkout' %}" class="nav-link {% if request.resolver_match.url_name == 'checkout' %}active bg-info{% endif %}">
+              <i class="nav-icon fas fa-shopping-basket"></i>
               <p>بررسی سبد خرید شخصی</p>
             </a>
           </li>
