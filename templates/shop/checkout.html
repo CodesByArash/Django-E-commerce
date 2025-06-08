@@ -5,240 +5,6 @@
 
 {% block extra_css %}
 <link rel="stylesheet" href="{% static 'shop/checkout.css' %}">
-<style>
-    .checkout-container {
-        max-width: 1200px;
-        margin: 0 auto;
-        padding: 0 1rem;
-    }
-    
-    .card {
-        border: none;
-        box-shadow: 0 0 15px rgba(0,0,0,0.1);
-        margin-bottom: 1.5rem;
-        background-color: #fff;
-        border-radius: 8px;
-    }
-    
-    .card-header {
-        background-color: #f8f9fa;
-        border-bottom: 1px solid #eee;
-        padding: 1rem 1.5rem;
-        border-radius: 8px 8px 0 0;
-    }
-    
-    .card-header h4 {
-        margin: 0;
-        color: #333;
-        font-weight: 600;
-        font-size: 1.25rem;
-    }
-    
-    .card-body {
-        padding: 1.5rem;
-    }
-    
-    .table {
-        margin-bottom: 0;
-        width: 100%;
-    }
-    
-    .table th {
-        border-top: none;
-        font-weight: 600;
-        color: #555;
-        padding: 1rem;
-        background-color: #f8f9fa;
-    }
-    
-    .table td {
-        vertical-align: middle;
-        padding: 1rem;
-        border-bottom: 1px solid #eee;
-    }
-    
-    .product-image {
-        width: 60px;
-        height: 60px;
-        object-fit: cover;
-        border-radius: 6px;
-        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-    }
-    
-    .quantity-input {
-        width: 80px !important;
-        text-align: center;
-        border: 1px solid #ddd;
-        border-radius: 4px;
-        padding: 0.5rem;
-        font-size: 0.9rem;
-    }
-    
-    .quantity-input:focus {
-        border-color: #80bdff;
-        box-shadow: 0 0 0 0.2rem rgba(0,123,255,0.25);
-        outline: none;
-    }
-    
-    .btn-remove {
-        padding: 0.5rem 1rem;
-        font-size: 0.875rem;
-        background-color: #dc3545;
-        color: white;
-        border: none;
-        border-radius: 4px;
-        cursor: pointer;
-        transition: all 0.3s ease;
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        gap: 0.5rem;
-        min-width: 100px;
-    }
-    
-    .btn-remove:hover {
-        background-color: #c82333;
-        transform: translateY(-1px);
-        box-shadow: 0 2px 4px rgba(220, 53, 69, 0.2);
-    }
-    
-    .btn-remove:active {
-        transform: translateY(0);
-    }
-    
-    .btn-update {
-        padding: 0.5rem 1rem;
-        font-size: 0.875rem;
-        background-color: #28a745;
-        color: white;
-        border: none;
-        border-radius: 4px;
-        cursor: pointer;
-        transition: all 0.3s ease;
-        margin-left: 0.5rem;
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        gap: 0.5rem;
-        min-width: 100px;
-    }
-    
-    .btn-update:hover {
-        background-color: #218838;
-        transform: translateY(-1px);
-        box-shadow: 0 2px 4px rgba(40, 167, 69, 0.2);
-    }
-    
-    .btn-update:active {
-        transform: translateY(0);
-    }
-    
-    .action-buttons {
-        display: flex;
-        gap: 0.5rem;
-        justify-content: flex-start;
-        align-items: center;
-    }
-    
-    .form-label {
-        font-weight: 500;
-        color: #555;
-        margin-bottom: 0.5rem;
-        font-size: 0.95rem;
-    }
-    
-    .form-control {
-        border: 1px solid #ddd;
-        padding: 0.75rem;
-        border-radius: 4px;
-        font-size: 0.95rem;
-        transition: all 0.3s ease;
-    }
-    
-    .form-control:focus {
-        border-color: #80bdff;
-        box-shadow: 0 0 0 0.2rem rgba(0,123,255,0.25);
-        outline: none;
-    }
-    
-    .btn-checkout {
-        background-color: #007bff;
-        border: none;
-        padding: 0.75rem 1.5rem;
-        font-weight: 500;
-        font-size: 1rem;
-        border-radius: 4px;
-        transition: all 0.3s ease;
-        width: 100%;
-    }
-    
-    .btn-checkout:hover {
-        background-color: #0056b3;
-        transform: translateY(-1px);
-        box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-    }
-    
-    .alert {
-        border: none;
-        border-radius: 6px;
-        padding: 1rem 1.5rem;
-        margin-bottom: 1rem;
-        font-size: 0.95rem;
-    }
-    
-    .alert-info {
-        background-color: #e3f2fd;
-        color: #0c5460;
-    }
-    
-    .alert-warning {
-        background-color: #fff3cd;
-        color: #856404;
-    }
-    
-    .total-price {
-        font-size: 1.25rem;
-        color: #28a745;
-        font-weight: 600;
-    }
-    
-    .product-title {
-        font-weight: 500;
-        color: #333;
-        font-size: 1rem;
-        margin-right: 1rem;
-    }
-    
-    .product-price {
-        color: #666;
-        font-size: 0.95rem;
-    }
-    
-    .checkout-summary {
-        background-color: #f8f9fa;
-        padding: 1.25rem;
-        border-radius: 6px;
-        margin-top: 1.5rem;
-        box-shadow: 0 2px 4px rgba(0,0,0,0.05);
-    }
-    
-    .checkout-summary-item {
-        display: flex;
-        justify-content: space-between;
-        margin-bottom: 0.75rem;
-        color: #666;
-        font-size: 0.95rem;
-    }
-    
-    .checkout-summary-total {
-        border-top: 1px solid #ddd;
-        margin-top: 0.75rem;
-        padding-top: 0.75rem;
-        font-weight: 600;
-        color: #333;
-        font-size: 1.1rem;
-    }
-</style>
 {% endblock %}
 
 {% block content %}
@@ -286,22 +52,25 @@
                                             </td>
                                             <td class="product-price">{{ item.product.price|floatformat:0 }} تومان</td>
                                             <td>
-                                                <input type="number" class="form-control quantity-input" 
-                                                       value="{{ item.quantity }}" min="1" 
-                                                       data-item-id="{{ item.id }}" 
-                                                       onchange="updateQuantity(this)">
-                                            </td>
-                                            <td>
-                                                <div class="action-buttons">
-                                                    <button class="btn btn-update" onclick="updateCartItem({{ item.product.id }})">
+                                                <form method="post" action="{% url 'shop:update_cart' item.product.id %}" class="d-inline">
+                                                    {% csrf_token %}
+                                                    <input type="number" class="form-control quantity-input" 
+                                                           name="quantity" value="{{ item.quantity }}" min="1">
+                                                    <button type="submit" class="btn btn-update mt-2">
                                                         <i class="fas fa-sync-alt"></i>
                                                         بروزرسانی
                                                     </button>
-                                                    <button class="btn btn-remove" onclick="removeCartItem({{ item.product.id }})">
+                                                </form>
+                                            </td>
+                                            <td>
+                                                <form method="post" action="{% url 'shop:remove_from_cart' item.product.id %}" class="d-inline" 
+                                                      onsubmit="return confirm('آیا از حذف این محصول از سبد خرید اطمینان دارید؟');">
+                                                    {% csrf_token %}
+                                                    <button type="submit" class="btn btn-remove">
                                                         <i class="fas fa-trash"></i>
                                                         حذف
                                                     </button>
-                                                </div>
+                                                </form>
                                             </td>
                                         </tr>
                                     {% endfor %}
@@ -333,22 +102,6 @@
                                 <div class="col-md-12 mb-3">
                                     <label for="address" class="form-label">آدرس کامل</label>
                                     <textarea class="form-control" id="address" name="address" rows="3" required></textarea>
-                                </div>
-                            </div>
-                            <div class="row">
-                                <div class="col-md-6 mb-3">
-                                    <label for="city" class="form-label">شهر</label>
-                                    <input type="text" class="form-control" id="city" name="city" required>
-                                </div>
-                                <div class="col-md-6 mb-3">
-                                    <label for="postal_code" class="form-label">کد پستی</label>
-                                    <input type="text" class="form-control" id="postal_code" name="postal_code" required>
-                                </div>
-                            </div>
-                            <div class="row">
-                                <div class="col-md-12 mb-3">
-                                    <label for="notes" class="form-label">توضیحات (اختیاری)</label>
-                                    <textarea class="form-control" id="notes" name="notes" rows="2"></textarea>
                                 </div>
                             </div>
                         </form>
@@ -392,7 +145,7 @@
                                 ادامه فرآیند خرید
                             </button>
                         {% else %}
-                            <button type="submit" class="btn btn-checkout">
+                            <button type="submit" form="checkout-form" class="btn btn-checkout">
                                 <i class="fas fa-credit-card"></i>
                                 ادامه فرآیند خرید
                             </button>
@@ -420,217 +173,11 @@
 {% endblock %}
 
 {% block extra_js %}
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-<script>
-    // Setup CSRF token for all AJAX requests
-    function getCookie(name) {
-        let cookieValue = null;
-        if (document.cookie && document.cookie !== '') {
-            const cookies = document.cookie.split(';');
-            for (let i = 0; i < cookies.length; i++) {
-                const cookie = cookies[i].trim();
-                if (cookie.substring(0, name.length + 1) === (name + '=')) {
-                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
-                    break;
-                }
-            }
-        }
-        return cookieValue;
-    }
-
-    // Setup AJAX CSRF token
-    $.ajaxSetup({
-        beforeSend: function(xhr, settings) {
-            if (!/^(GET|HEAD|OPTIONS|TRACE)$/i.test(settings.type) && !this.crossDomain) {
-                xhr.setRequestHeader("X-CSRFToken", getCookie('csrftoken'));
-            }
-        }
-    });
-
-    // Test function to check if endpoints are working
-    function testCartEndpoints() {
-        // Test update endpoint
-        fetch("{% url 'shop:update_cart' %}", {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value,
-                'X-Requested-With': 'XMLHttpRequest'
-            },
-            body: JSON.stringify({
-                product_id: 1,
-                quantity: 1
-            })
-        })
-        .then(response => response.json())
-        .then(data => console.log('Update test response:', data))
-        .catch(error => console.error('Update test error:', error));
-
-        // Test remove endpoint
-        fetch("{% url 'shop:remove_from_cart' %}", {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value,
-                'X-Requested-With': 'XMLHttpRequest'
-            },
-            body: JSON.stringify({
-                product_id: 1
-            })
-        })
-        .then(response => response.json())
-        .then(data => console.log('Remove test response:', data))
-        .catch(error => console.error('Remove test error:', error));
-    }
-
-    // Run test when page loads
-    document.addEventListener('DOMContentLoaded', testCartEndpoints);
-
-    function updateCartItem(productId, quantity) {
-        if (!quantity) {
-            quantity = document.querySelector(`input[data-item-id="${productId}"]`).value;
-        }
-        console.log('Updating cart item:', { productId, quantity });
-        $.ajax({
-            url: '{% url "shop:update_cart" %}',
-            method: 'POST',
-            contentType: 'application/json',
-            data: JSON.stringify({
-                product_id: productId,
-                quantity: parseInt(quantity)
-            }),
-            headers: {
-                'X-CSRFToken': getCookie('csrftoken'),
-                'X-Requested-With': 'XMLHttpRequest'
-            },
-            success: function(response) {
-                console.log('Update response:', response);
-                if (response.status === 'success') {
-                    showMessage(response.message, 'success');
-                    if (response.cart_total !== undefined) {
-                        $('.total-price').text(response.cart_total.toLocaleString() + ' تومان');
-                    }
-                    if (response.cart_count !== undefined) {
-                        $('.cart-count').text(response.cart_count);
-                    }
-                    setTimeout(() => window.location.reload(), 1000);
-                } else {
-                    showMessage(response.message || 'خطا در بروزرسانی سبد خرید', 'error');
-                }
-            },
-            error: function(xhr, status, error) {
-                console.error('Update error:', { xhr, status, error });
-                let errorMessage = 'خطا در ارتباط با سرور';
-                try {
-                    const response = xhr.responseJSON;
-                    if (response && response.message) {
-                        errorMessage = response.message;
-                    } else if (xhr.responseText) {
-                        errorMessage = xhr.responseText;
-                    }
-                } catch (e) {
-                    console.error('Error parsing response:', e);
-                }
-                showMessage(errorMessage, 'error');
-            }
-        });
-    }
-    
-    function removeCartItem(productId) {
-        console.log('Removing cart item:', productId);
-        if (!confirm('آیا از حذف این محصول از سبد خرید اطمینان دارید؟')) {
-            return;
-        }
-        
-        const requestData = {
-            product_id: productId
-        };
-        console.log('Request data:', requestData);
-        
-        $.ajax({
-            url: '{% url "shop:remove_from_cart" %}',
-            method: 'POST',
-            contentType: 'application/json',
-            data: JSON.stringify(requestData),
-            headers: {
-                'X-CSRFToken': getCookie('csrftoken'),
-                'X-Requested-With': 'XMLHttpRequest'
-            },
-            beforeSend: function(xhr) {
-                console.log('Request headers:', xhr.getAllResponseHeaders());
-                console.log('Request URL:', this.url);
-                console.log('Request method:', this.method);
-                console.log('Request data:', this.data);
-            },
-            success: function(response) {
-                console.log('Remove response:', response);
-                if (response.status === 'success') {
-                    showMessage(response.message, 'success');
-                    if (response.cart_total !== undefined) {
-                        $('.total-price').text(response.cart_total.toLocaleString() + ' تومان');
-                    }
-                    if (response.cart_count !== undefined) {
-                        $('.cart-count').text(response.cart_count);
-                    }
-                    setTimeout(() => window.location.reload(), 1000);
-                } else {
-                    showMessage(response.message || 'خطا در حذف محصول از سبد خرید', 'error');
-                }
-            },
-            error: function(xhr, status, error) {
-                console.error('Remove error details:', {
-                    status: status,
-                    error: error,
-                    responseText: xhr.responseText,
-                    statusText: xhr.statusText,
-                    statusCode: xhr.status
-                });
-                let errorMessage = 'خطا در ارتباط با سرور';
-                try {
-                    const response = xhr.responseJSON;
-                    if (response && response.message) {
-                        errorMessage = response.message;
-                    } else if (xhr.responseText) {
-                        errorMessage = xhr.responseText;
-                    }
-                } catch (e) {
-                    console.error('Error parsing response:', e);
-                }
-                showMessage(errorMessage, 'error');
-            }
-        });
-    }
-
-    function showMessage(message, type = 'info') {
-        const messageDiv = document.createElement('div');
-        messageDiv.className = `alert alert-${type === 'error' ? 'danger' : type} alert-dismissible fade show`;
-        messageDiv.style.position = 'fixed';
-        messageDiv.style.top = '20px';
-        messageDiv.style.left = '50%';
-        messageDiv.style.transform = 'translateX(-50%)';
-        messageDiv.style.zIndex = '9999';
-        messageDiv.style.minWidth = '300px';
-        messageDiv.style.textAlign = 'center';
-        messageDiv.style.padding = '15px';
-        messageDiv.style.borderRadius = '5px';
-        messageDiv.style.boxShadow = '0 2px 5px rgba(0,0,0,0.2)';
-        
-        const closeButton = document.createElement('button');
-        closeButton.type = 'button';
-        closeButton.className = 'btn-close';
-        closeButton.setAttribute('data-bs-dismiss', 'alert');
-        closeButton.setAttribute('aria-label', 'Close');
-        
-        messageDiv.appendChild(document.createTextNode(message));
-        messageDiv.appendChild(closeButton);
-        
-        document.body.appendChild(messageDiv);
-        
-        // Auto remove after 5 seconds
-        setTimeout(() => {
-            messageDiv.classList.remove('show');
-            setTimeout(() => messageDiv.remove(), 150);
-        }, 5000);
-    }
-</script>
+{% if messages %}
+<!-- <script>
+    {% for message in messages %}
+        alert("{{ message }}");
+    {% endfor %}
+</script> -->
+{% endif %}
 {% endblock %}

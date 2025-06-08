@@ -19,7 +19,7 @@
         {%if qs %}
         <div class="card">
           <div class="card-header">
-            <a href="{% url 'shop:seller-product-create' %}" class="btn btn-primary">افزودن محصول جدید</a>
+            <a href="{% url 'account:product-create' %}" class="btn btn-primary">افزودن محصول جدید</a>
           </div>
           <div class="card-body table-responsive p-0">
             <table class="table table-hover">
@@ -40,9 +40,9 @@
                       <td>{{items.category.all|join:", "}}</td>
                       <td>{{items.description|truncatewords:20}}</td>
                       <td>
-                        <a class="btn btn-sm btn-info" href="{% url 'shop:seller-product-update' items.id %}">ویرایش</a>
+                        <a class="btn btn-sm btn-info" href="{% url 'account:product-update' items.id %}">ویرایش</a>
                         {% if user.is_superuser %}
-                        <a class="btn btn-sm btn-danger" href="{% url 'shop:seller-product-delete' items.id %}">حذف</a>
+                        <a class="btn btn-sm btn-danger" href="{% url 'account:product-delete' items.id %}">حذف</a>
                         {% endif %}
                       </td>
                   </tr>

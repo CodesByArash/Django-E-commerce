@@ -32,7 +32,7 @@ class IndexView(ListView):
     def get_context_data(self, **kwargs):
         """Add categories to context."""
         context = super().get_context_data(**kwargs)
-        context['category'] = self.product_repository.get_all_categories()
+        context['categories'] = self.product_repository.get_all_categories()
         return context
 
 class ProductDetailView(DetailView):
@@ -51,52 +51,8 @@ class ProductDetailView(DetailView):
     def get_context_data(self, **kwargs):
         """Add categories to context."""
         context = super().get_context_data(**kwargs)
-        context['category'] = self.product_repository.get_all_categories()
+        context['categories'] = self.product_repository.get_all_categories()
         return context
-
-class AddToCartView(LoginRequiredMixin, DetailView):
-    """View for adding a product to cart."""
-    model = Product
-    http_method_names = ['post']
-
-    def __init__(self, **kwargs):
-        super().__init__(**kwargs)
-        self.product_repository = ProductRepository()
-        self.cart_repository = CartRepository()
-
-    def post(self, request, *args, **kwargs):
-        """Handle POST request to add product to cart."""
-        product = self.get_object()
-        quantity = int(request.POST.get('quantity', 1))
-        
-        if quantity <= 0:
-            messages.error(request, 'تعداد باید بیشتر از صفر باشد.')
-            return redirect('shop:detail', pk=product.id)
-        
-        # دریافت یا ایجاد سبد خرید
-        cart = self.cart_repository.get_or_create_cart(request.user.id)
-        
-        # اضافه کردن محصول به سبد خرید
-        cart_item = self.cart_repository.add_item(
-            cart_id=cart.id,
-            product_id=product.id,
-            quantity=quantity
-        )
-        
-        if cart_item:
-            messages.success(request, f'{product.title} به سبد خرید اضافه شد.')
-        else:
-            messages.error(request, 'خطا در اضافه کردن محصول به سبد خرید.')
-            return redirect('shop:detail', pk=product.id)
-        
-        if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
-            return JsonResponse({
-                'status': 'success',
-                'message': f'{product.title} به سبد خرید اضافه شد.',
-                'cart_count': cart.total_items
-            })
-        
-        return redirect('shop:cart')
 
 class CategoryView(ListView):
     """View for displaying products in a category."""
@@ -114,5 +70,6 @@ class CategoryView(ListView):
     def get_context_data(self, **kwargs):
         """Add category to context."""
         context = super().get_context_data(**kwargs)
-        context['category'] = get_object_or_404(Category, slug=self.kwargs['slug'], status=True)
+        context['current_category'] = get_object_or_404(Category, slug=self.kwargs['slug'], status=True)
+        context['categories'] = self.product_repository.get_all_categories()
         return context 

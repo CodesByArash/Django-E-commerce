@@ -5,76 +5,6 @@
 
 {% block extra_css %}
 <link rel="stylesheet" href="{% static 'shop/detail.css' %}">
-<style>
-    .product-detail {
-        background: #fff;
-        padding: 30px;
-        border-radius: 10px;
-        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-        margin: 20px 0;
-    }
-    .product-image {
-        width: 100%;
-        height: 400px;
-        object-fit: cover;
-        border-radius: 5px;
-        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-    }
-    .product-title {
-        font-size: 2rem;
-        color: #333;
-        margin-bottom: 20px;
-    }
-    .product-price {
-        font-size: 1.5rem;
-        color: #28a745;
-        font-weight: bold;
-        margin-bottom: 20px;
-    }
-    .product-description {
-        font-size: 1.1rem;
-        color: #666;
-        line-height: 1.6;
-        margin-bottom: 30px;
-    }
-    .quantity-input {
-        width: 100px;
-        display: inline-block;
-        margin-right: 10px;
-    }
-    .button-container {
-        margin-top: 30px;
-    }
-    .btn-add-to-cart {
-        background-color: #28a745;
-        color: white;
-        padding: 10px 20px;
-        border: none;
-        border-radius: 5px;
-        margin-left: 10px;
-        transition: background-color 0.2s;
-    }
-    .btn-add-to-cart:hover {
-        background-color: #218838;
-        color: white;
-    }
-    .btn-outline-secondary {
-        padding: 10px 20px;
-        border-radius: 5px;
-        transition: all 0.2s;
-    }
-    .btn-outline-secondary:hover {
-        background-color: #6c757d;
-        color: white;
-    }
-    .form-group {
-        margin-bottom: 20px;
-    }
-    .form-group label {
-        font-weight: bold;
-        margin-left: 10px;
-    }
-</style>
 {% endblock %}
 
 {% block content %}
@@ -95,22 +25,45 @@
                     <div class="product-price">{{ product_obj.price|floatformat:0 }} تومان</div>
                     <p class="product-description">{{ product_obj.description|linebreaks }}</p>
                     
-                    <div class="form-group">
-                        <label for="quantity">تعداد:</label>
-                        <input type="number" class="form-control quantity-input" id="quantity" value="1" min="1">
+                    <div class="stock-info mb-3">
+                        {% if product_obj.quantity > 0 %}
+                            <span class="text-success">
+                                <i class="fas fa-check-circle"></i>
+                                موجود در انبار: {{ product_obj.quantity }} عدد
+                            </span>
+                        {% else %}
+                            <span class="text-danger">
+                                <i class="fas fa-times-circle"></i>
+                                ناموجود
+                            </span>
+                        {% endif %}
                     </div>
                     
-                    <div class="button-container">
-                        <button id="{{ product_obj.id }}" class="btn btn-add-to-cart">
-                            <i class="fas fa-cart-plus"></i>
-                            افزودن به سبد خرید
-                        </button>
+                    <form method="post" action="{% url 'shop:add_to_cart' product_obj.id %}" class="mt-3">
+                        {% csrf_token %}
+                        <div class="form-group">
+                            <label for="quantity">تعداد:</label>
+                            <input type="number" class="form-control quantity-input" name="quantity" id="quantity" 
+                                   value="1" min="1" max="{{ product_obj.quantity }}" 
+                                   {% if product_obj.quantity == 0 %}disabled{% endif %}
+                                   style="width: 100px;">
+                        </div>
                         
-                        <a href="{% url 'shop:index' %}" class="btn btn-outline-secondary">
-                            <i class="fas fa-arrow-right"></i>
-                            بازگشت به فروشگاه
-                        </a>
-                    </div>
+                        <div class="detail-buttons">
+                            <a href="{% url 'shop:index' %}" class="btn btn-outline-secondary">
+                                <i class="fas fa-arrow-right"></i>
+                                بازگشت به فروشگاه
+                            </a>
+                            <button type="submit" class="btn btn-add-to-cart" {% if product_obj.quantity == 0 %}disabled{% endif %}>
+                                <i class="fas fa-shopping-cart"></i>
+                                {% if product_obj.quantity > 0 %}
+                                    افزودن به سبد خرید
+                                {% else %}
+                                    ناموجود
+                                {% endif %}
+                            </button>
+                        </div>
+                    </form>
                 </div>
             </div>
         </div>
@@ -119,40 +72,11 @@
 {% endblock %}
 
 {% block extra_js %}
-<script type="text/javascript">
-    $(document).on('click', '.btn-add-to-cart', function() {
-        var product_id = this.id.toString();
-        var quantity = parseInt(document.getElementById("quantity").value);
-        
-        if (quantity < 1) {
-            alert('تعداد باید بیشتر از صفر باشد');
-            return;
-        }
-        
-        $.ajax({
-            url: "/shop/cart/add/" + product_id + "/",
-            method: 'POST',
-            data: {
-                'quantity': quantity,
-                'csrfmiddlewaretoken': '{{ csrf_token }}'
-            },
-            success: function(response) {
-                if (response.status === 'success') {
-                    alert(response.message);
-                    updateCartCount(response.cart_count);
-                } else {
-                    alert('خطا در افزودن به سبد خرید');
-                }
-            },
-            error: function() {
-                alert('خطا در ارتباط با سرور');
-            }
-        });
-    });
-    
-    function updateCartCount(count) {
-        var cartLink = document.getElementById("cart");
-        cartLink.innerHTML = '<i class="fas fa-shopping-cart"></i> سبد خرید (' + count + ')';
-    }
-</script>
+{% if messages %}
+<!-- <script>
+    {% for message in messages %}
+        alert("{{ message }}");
+    {% endfor %}
+</script> -->
+{% endif %}
 {% endblock %}

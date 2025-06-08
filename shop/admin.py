@@ -1,6 +1,6 @@
 from django.contrib import admin
 from django.contrib.admin.options import ModelAdmin
-from .models import Product, Order, Category, OrderDetails, Cart, CartItem
+from .models import Product, Order, Category, OrderItem, Cart, CartItem
 # Register your models here.
 
 
@@ -21,13 +21,25 @@ class ProductAdmin(admin.ModelAdmin):
     category_to_str.short_description="دسته بندی"
 
 
-class OrderAdmin(admin.ModelAdmin):
+class OrderItemInline(admin.TabularInline):
+    model = OrderItem
+    extra = 0
+    readonly_fields = ('price', 'total_price')
 
-    list_display = ('costumer','items','jpublish','status','total')
-    search_fields= ('category',)
-    list_filter  = ('date','status')
-    search_fields = ('title','')
-    ordering = ['-status','-date']
+class OrderAdmin(admin.ModelAdmin):
+    list_display = ('user', 'total_price', 'total_items', 'created_at', 'status')
+    list_filter = ('status', 'created_at')
+    search_fields = ('user__email', 'user__username', 'tracking_code')
+    readonly_fields = ('created_at', 'updated_at')
+    inlines = [OrderItemInline]
+
+    def total_price(self, obj):
+        return obj.total_price
+    total_price.short_description = 'قیمت کل'
+
+    def total_items(self, obj):
+        return obj.total_items
+    total_items.short_description = 'تعداد کل آیتم‌ها'
 
 
 class CategoryAdmin(admin.ModelAdmin):
@@ -68,11 +80,19 @@ class CartItemAdmin(admin.ModelAdmin):
         return obj.total_price
     total_price.short_description = 'قیمت کل'
 
-admin.site.register(OrderDetails)
-admin.site.register(Category,CategoryAdmin)
-admin.site.register(Product,ProductAdmin)
-admin.site.register(Order,OrderAdmin)
+class OrderItemAdmin(admin.ModelAdmin):
+    list_display = ('product', 'order', 'quantity', 'price', 'total_price')
+    list_filter = ('created_at',)
+    search_fields = ('product__title', 'order__user__email')
+    readonly_fields = ('created_at',)
 
-# ثبت مدل‌های جدید سبد خرید
+    def total_price(self, obj):
+        return obj.total_price
+    total_price.short_description = 'قیمت کل'
+
+admin.site.register(Category, CategoryAdmin)
+admin.site.register(Product, ProductAdmin)
+admin.site.register(Order, OrderAdmin)
+admin.site.register(OrderItem, OrderItemAdmin)
 admin.site.register(Cart, CartAdmin)
 admin.site.register(CartItem, CartItemAdmin)

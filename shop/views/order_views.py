@@ -1,7 +1,7 @@
 from django.views.generic import ListView, DetailView
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.shortcuts import get_object_or_404
-from shop.models import Order, OrderDetails
+from shop.models import Order, OrderItem
 
 class OrderListView(LoginRequiredMixin, ListView):
     """View for displaying user's orders."""

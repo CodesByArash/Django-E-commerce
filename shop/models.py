@@ -48,6 +48,7 @@ class Product(models.Model):
     image          = models.ImageField(upload_to="images")
     thumbnail      = models.ImageField(upload_to='uploads/', blank=True, null=True)
     date_added     = models.DateTimeField(auto_now_add=True)
+    quantity       = models.IntegerField(default=0)
 
     def __str__(self):
         return self.title
@@ -198,32 +199,102 @@ class CartItem(models.Model):
             self.delete()
 
 class Order(models.Model):
-    STATUS_CHOICES =(
-        ('s','ارسال شده'),
-        ('p','در حال پردازش'),
-        ('r','رسیده به دست مشتری'),
+    STATUS_CHOICES = (
+        ('pending', 'در انتظار پرداخت'),
+        ('processing', 'در حال پردازش'),
+        ('shipped', 'ارسال شده'),
+        ('delivered', 'تحویل داده شده'),
+        ('cancelled', 'لغو شده'),
     )
-    costumer = models.ForeignKey(User, on_delete=CASCADE,verbose_name='نام مشتری')
-    items    = models.CharField(max_length=1000,verbose_name='محصولات')
-    date     = models.DateTimeField(default=timezone.now, verbose_name='تاریخ ثبت',)
-    status   = models.CharField(max_length=1, choices=STATUS_CHOICES,verbose_name='وضعیت سفارش',default=STATUS_CHOICES[1][1])
-    total    = models.CharField(max_length=200,verbose_name="قیمت کل")
-    class Meta:
-        verbose_name="سفارش"
-        verbose_name_plural='سفارشات'
-
-    def jpublish(self):
-        return  jalali_converter(self.date)
     
-    jpublish.short_description = "زمان انتشار"
+    user = models.ForeignKey(
+        User, 
+        on_delete=models.CASCADE,
+        verbose_name='کاربر',
+        related_name='orders'
+    )
+    created_at = models.DateTimeField(
+        auto_now_add=True,
+        verbose_name='تاریخ ثبت'
+    )
+    updated_at = models.DateTimeField(
+        auto_now=True,
+        verbose_name='آخرین بروزرسانی'
+    )
+    status = models.CharField(
+        max_length=20,
+        choices=STATUS_CHOICES,
+        default='pending',
+        verbose_name='وضعیت سفارش'
+    )
+    total_price = models.DecimalField(
+        max_digits=10,
+        decimal_places=2,
+        verbose_name='قیمت کل'
+    )
+    shipping_address = models.TextField(
+        verbose_name='آدرس ارسال'
+    )
+    tracking_code = models.CharField(
+        max_length=50,
+        blank=True,
+        null=True,
+        verbose_name='کد رهگیری'
+    )
 
-
-
-class OrderDetails(models.Model):
-    order    = models.ForeignKey(Order,on_delete=CASCADE)
-    Item     = models.ForeignKey(Product,on_delete=CASCADE)
-    quantity = models.CharField(max_length=100)
-    price    = models.CharField(max_length=300,blank=True)
     class Meta:
-        verbose_name="جزییات سفارش"
-        verbose_name_plural="جزییات سفارشات"
+        verbose_name = 'سفارش'
+        verbose_name_plural = 'سفارشات'
+        ordering = ['-created_at']
+
+    def __str__(self):
+        return f'سفارش {self.user.get_full_name()} - {self.created_at.strftime("%Y-%m-%d")}'
+
+    @property
+    def total_items(self):
+        """تعداد کل آیتم‌ها در سفارش"""
+        return sum(item.quantity for item in self.items.all())
+
+    def get_total_price(self):
+        """محاسبه قیمت کل سفارش"""
+        return sum(item.total_price for item in self.items.all())
+
+class OrderItem(models.Model):
+    order = models.ForeignKey(
+        Order,
+        on_delete=models.CASCADE,
+        related_name='items',
+        verbose_name='سفارش'
+    )
+    product = models.ForeignKey(
+        Product,
+        on_delete=models.CASCADE,
+        verbose_name='محصول'
+    )
+    quantity = models.PositiveIntegerField(
+        default=1,
+        validators=[MinValueValidator(1)],
+        verbose_name='تعداد'
+    )
+    price = models.DecimalField(
+        max_digits=10,
+        decimal_places=2,
+        verbose_name='قیمت واحد'
+    )
+    created_at = models.DateTimeField(
+        auto_now_add=True,
+        verbose_name='تاریخ ثبت'
+    )
+
+    class Meta:
+        verbose_name = 'آیتم سفارش'
+        verbose_name_plural = 'آیتم‌های سفارش'
+        unique_together = ('order', 'product')
+
+    def __str__(self):
+        return f'{self.product.title} - {self.quantity} عدد'
+
+    @property
+    def total_price(self):
+        """محاسبه قیمت کل آیتم"""
+        return self.price * self.quantity

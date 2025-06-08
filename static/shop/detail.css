@@ -1,93 +1,83 @@
 /* Product Detail Styles */
 .product-detail {
-    background-color: #fff;
-    border-radius: 8px;
-    box-shadow: 0 0 15px rgba(0,0,0,0.1);
-    padding: 2rem;
-    margin-top: 2rem;
-    margin-bottom: 2rem;
-}
-
-.product-detail .product-image {
-    width: 100%;
-    height: auto;
-    border-radius: 8px;
+    background: #fff;
+    padding: 30px;
+    border-radius: 10px;
     box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-    margin-bottom: 1rem;
+    margin: 20px 0;
 }
 
-.product-detail .product-title {
+.product-image {
+    width: 100%;
+    height: 400px;
+    object-fit: cover;
+    border-radius: 5px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.product-title {
     font-size: 2rem;
-    font-weight: 600;
     color: #333;
-    margin-bottom: 1rem;
-    line-height: 1.4;
+    margin-bottom: 20px;
 }
 
-.product-detail .product-price {
-    font-size: 1.8rem;
+.product-price {
+    font-size: 1.5rem;
     color: #28a745;
-    font-weight: 600;
-    margin-bottom: 1.5rem;
-    display: block;
+    font-weight: bold;
+    margin-bottom: 20px;
 }
 
-.product-detail .product-description {
+.product-description {
+    font-size: 1.1rem;
     color: #666;
-    line-height: 1.8;
-    margin-bottom: 2rem;
-    font-size: 1.1rem;
-    text-align: justify;
+    line-height: 1.6;
+    margin-bottom: 30px;
 }
 
-/* Button Container */
-.product-detail .button-container {
-    display: flex;
-    gap: 1rem;
-    margin-top: 2rem;
-    flex-wrap: wrap;
+.quantity-input {
+    width: 100px;
+    display: inline-block;
+    margin-right: 10px;
 }
 
-.product-detail .button-container .btn {
-    flex: 1;
-    min-width: 180px;
-    max-width: 250px;
-    height: 45px;
-    padding: 0.6rem 1.5rem;
-    font-size: 1.1rem;
-    font-weight: 500;
-    border-radius: 4px;
-    transition: all 0.3s ease;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    gap: 0.5rem;
-    line-height: 1;
+.button-container {
+    margin-top: 30px;
 }
 
-.product-detail .btn-add-to-cart {
-    background-color: #ffc107;
-    border-color: #ffc107;
-    color: #000;
+.btn-add-to-cart {
+    background-color: #28a745;
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    margin-left: 10px;
+    transition: background-color 0.2s;
 }
 
-.product-detail .btn-add-to-cart:hover {
-    background-color: #ffca2c;
-    border-color: #ffca2c;
-    transform: translateY(-2px);
-    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+.btn-add-to-cart:hover {
+    background-color: #218838;
+    color: white;
 }
 
-.product-detail .btn-outline-secondary {
-    border: 2px solid #6c757d;
-    color: #6c757d;
+.btn-outline-secondary {
+    padding: 10px 20px;
+    border-radius: 5px;
+    transition: all 0.2s;
 }
 
-.product-detail .btn-outline-secondary:hover {
+.btn-outline-secondary:hover {
     background-color: #6c757d;
-    color: #fff;
-    transform: translateY(-2px);
-    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    color: white;
+}
+
+.form-group {
+    margin-bottom: 20px;
+}
+
+.form-group label {
+    font-weight: bold;
+    margin-left: 10px;
 }
 
 /* RTL Specific Styles */
@@ -99,36 +89,6 @@
 .ms-2 {
     margin-right: 0.5rem !important;
     margin-left: 0 !important;
-}
-
-/* Form and Button Styles */
-.product-detail .form-group {
-    margin-bottom: 1.5rem;
-    display: flex;
-    align-items: center;
-    gap: 1rem;
-}
-
-.product-detail .form-group label {
-    font-weight: 500;
-    color: #555;
-    margin-bottom: 0;
-    white-space: nowrap;
-}
-
-.product-detail .quantity-input {
-    width: 100px !important;
-    text-align: center;
-    font-size: 1.1rem;
-    padding: 0.5rem;
-    border: 1px solid #ddd;
-    border-radius: 4px;
-    background-color: #f8f9fa;
-}
-
-.product-detail .quantity-input:focus {
-    border-color: #ffc107;
-    box-shadow: 0 0 0 0.2rem rgba(255, 193, 7, 0.25);
 }
 
 /* Responsive Styles */

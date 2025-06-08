@@ -31,3 +31,42 @@ body{
     background-color: black;
     border-color: rgb(0, 0, 0);
 }
+
+.navbar .dropdown-menu.categories-menu {
+    min-width: 300px !important;
+    background-color: rgb(36, 35, 35) !important;
+    border: 1px solid rgb(49, 49, 49) !important;
+    margin-top: 0.5rem !important;
+}
+
+.navbar .dropdown-menu.categories-menu .dropdown-item {
+    white-space: normal !important;
+    color: rgb(156, 156, 156) !important;
+    padding: 8px 15px !important;
+    background-color: transparent !important;
+}
+
+.navbar .dropdown-menu.categories-menu .dropdown-item:hover,
+.navbar .dropdown-menu.categories-menu .dropdown-item:focus {
+    background-color: rgb(49, 49, 49) !important;
+    color: rgb(255, 255, 255) !important;
+}
+
+.navbar .dropdown-menu.categories-menu .dropdown-item.active,
+.navbar .dropdown-menu.categories-menu .dropdown-item.active:hover,
+.navbar .dropdown-menu.categories-menu .dropdown-item.active:focus {
+    background-color: rgb(49, 49, 49) !important;
+    color: rgb(255, 255, 255) !important;
+}
+
+.navbar .dropdown-menu.categories-menu .row {
+    margin: 0 !important;
+}
+
+.navbar .dropdown-menu.categories-menu .col-md-4 {
+    padding: 5px !important;
+}
+
+.navbar .dropdown-menu.categories-menu .dropdown-toggle::after {
+    display: none !important;
+}

@@ -5,53 +5,6 @@
 
 {% block extra_css %}
 <link rel="stylesheet" href="{% static 'shop/index.css' %}">
-<style>
-    .card {
-        margin-bottom: 20px;
-        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-        transition: transform 0.2s;
-    }
-    .card:hover {
-        transform: translateY(-5px);
-    }
-    .card-img-top {
-        object-fit: cover;
-        height: 200px;
-    }
-    .card-title {
-        font-size: 1.1rem;
-        margin-bottom: 10px;
-    }
-    .card-title a {
-        color: #333;
-        text-decoration: none;
-    }
-    .card-title a:hover {
-        color: #007bff;
-    }
-    .card-text {
-        color: #28a745;
-        font-weight: bold;
-        font-size: 1.2rem;
-        margin-bottom: 15px;
-    }
-    .form-group {
-        margin-bottom: 15px;
-    }
-    .btn-warning {
-        margin-right: 5px;
-    }
-    .pagination {
-        margin-top: 30px;
-    }
-    .page-link {
-        color: #007bff;
-    }
-    .page-item.active .page-link {
-        background-color: #007bff;
-        border-color: #007bff;
-    }
-</style>
 {% endblock %}
 
 {% block content %}
@@ -67,19 +20,22 @@
                     {% endif %}
                     <div class="card-body">
                         <div class="card-title">
-                            <a id="nm{{product.id}}" href="{% url 'shop:detail' product.id %}">{{product.title}}</a>
+                            <a href="{% url 'shop:detail' product.id %}">{{product.title}}</a>
                         </div>
-                        <div id="price{{product.id}}" class="card-text">
+                        <div class="card-text">
                             {{product.price|floatformat:0}} تومان
                         </div>
 
-                        <div class="form-group">
-                            <label for="quantity{{product.id}}">تعداد:</label>
-                            <input type="number" class="form-control" id="quantity{{product.id}}" value="1" min="1" style="width: 100px; display: inline-block;">
+                        <div class="card-buttons">
+                            <a href="{% url 'shop:detail' product.id %}" class="btn btn-outline-primary" style="font-size: 0.8rem;">جزئیات</a>
+                            <form action="{% url 'shop:add_to_cart' product.id %}" method="post" class="d-inline">
+                                {% csrf_token %}
+                                <button type="submit" class="btn btn-add-to-cart">
+                                    <i class="fas fa-shopping-cart"></i>
+                                    افزودن به سبد خرید
+                                </button>
+                            </form>
                         </div>
-
-                        <a class="btn btn-info" href="{% url 'shop:detail' product.id %}">جزییات</a>
-                        <button id="{{product.id}}" class="cartbutton btn btn-success">افزودن به سبد خرید</button>
                     </div>
                 </div>
             </div>
@@ -92,15 +48,22 @@
 </div>
 
 {% if product_obj.has_other_pages %}
-<div class="row">
-    <div class="col-md-3 offset-md-4">
-        <ul class="pagination">
+    <nav aria-label="Page navigation" class="mt-4">
+        <ul class="pagination justify-content-center">
             {% if product_obj.has_previous %}
                 <li class="page-item">
-                    <a class="page-link" href="?page={{ product_obj.previous_page_number }}{% if search_query %}&q={{ search_query }}{% endif %}{% if category %}&category={{ category }}{% endif %}">صفحه ی قبلی</a>
+                    <a class="page-link" href="?page={{ product_obj.previous_page_number }}" aria-label="Previous">
+                        <span aria-hidden="true">&laquo;</span>
+                    </a>
+                </li>
+            {% else %}
+                <li class="page-item disabled">
+                    <a class="page-link" href="#" aria-label="Previous">
+                        <span aria-hidden="true">&laquo;</span>
+                    </a>
                 </li>
             {% endif %}
-            
+
             {% for i in product_obj.paginator.page_range %}
                 {% if product_obj.number == i %}
                     <li class="page-item active">
@@ -108,54 +71,37 @@
                     </li>
                 {% else %}
                     <li class="page-item">
-                        <a class="page-link" href="?page={{ i }}{% if search_query %}&q={{ search_query }}{% endif %}{% if category %}&category={{ category }}{% endif %}">{{ i }}</a>
+                        <a class="page-link" href="?page={{ i }}">{{ i }}</a>
                     </li>
                 {% endif %}
             {% endfor %}
-            
+
             {% if product_obj.has_next %}
                 <li class="page-item">
-                    <a class="page-link" href="?page={{ product_obj.next_page_number }}{% if search_query %}&q={{ search_query }}{% endif %}{% if category %}&category={{ category }}{% endif %}">صفحه ی بعدی</a>
+                    <a class="page-link" href="?page={{ product_obj.next_page_number }}" aria-label="Next">
+                        <span aria-hidden="true">&raquo;</span>
+                    </a>
+                </li>
+            {% else %}
+                <li class="page-item disabled">
+                    <a class="page-link" href="#" aria-label="Next">
+                        <span aria-hidden="true">&raquo;</span>
+                    </a>
                 </li>
             {% endif %}
         </ul>
-    </div>
-</div>
+    </nav>
 {% endif %}
 {% endblock %}
 
 {% block extra_js %}
-<script type="text/javascript">
-    $(document).on('click', '.cartbutton', function() {
-        var product_id = this.id.toString();
-        var quantity = parseInt(document.getElementById("quantity" + product_id).value);
-        
-        $.ajax({
-            url: "/shop/cart/add/" + product_id + "/",
-            method: 'POST',
-            data: {
-                'quantity': quantity,
-                'csrfmiddlewaretoken': '{{ csrf_token }}'
-            },
-            success: function(response) {
-                if (response.status === 'success') {
-                    alert(response.message);
-                    updateCartCount(response.cart_count);
-                } else {
-                    alert('خطا در افزودن به سبد خرید');
-                }
-            },
-            error: function() {
-                alert('خطا در ارتباط با سرور');
-            }
-        });
-    });
-    
-    function updateCartCount(count) {
-        var cartLink = document.getElementById("cart");
-        cartLink.innerHTML = '<i class="fas fa-shopping-cart"></i> سبد خرید (' + count + ')';
-    }
-</script>
+{% if messages %}
+<!-- <script>
+    {% for message in messages %}
+        alert("{{ message }}");
+    {% endfor %}
+</script> -->
+{% endif %}
 {% endblock %}
 
 

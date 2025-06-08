@@ -48,6 +48,7 @@ INSTALLED_APPS = [
     # django third party apps
     'widget_tweaks',
     'crispy_forms',
+    'crispy_bootstrap4',
     # drf third party apps
     'drf_yasg',
     # drf apps

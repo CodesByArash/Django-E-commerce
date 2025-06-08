@@ -37,6 +37,27 @@
 
 </head>
 <body class="hold-transition sidebar-mini layout-fixed">
+<style>
+  .sidebar {
+    width: 280px !important;
+  }
+  .main-sidebar {
+    width: 280px !important;
+  }
+  .content-wrapper {
+    margin-right: 280px !important;
+  }
+  .main-header {
+    margin-right: 280px !important;
+  }
+  .nav-sidebar .nav-item .nav-link {
+    padding: 0.8rem 1rem;
+    font-size: 1rem;
+  }
+  .nav-sidebar .nav-item .nav-link p {
+    margin-right: 0.5rem;
+  }
+</style>
 <div class="wrapper">
 
   <!-- Navbar -->
@@ -56,18 +77,6 @@
         <a href="{% url 'shop:orders' %}" class="nav-link">تاریخچه سفارشات</a>
       </li>
     </ul>
-
-    
-    <form class="form-inline ml-3">
-      <div class="input-group input-group-sm">
-        <input class="form-control form-control-navbar" type="search" placeholder="جستجو" aria-label="Search">
-        <div class="input-group-append">
-          <button class="btn btn-navbar" type="submit">
-            <i class="fas fa-search"></i>
-          </button>
-        </div>
-      </div>
-    </form>
 
     <!-- Right navbar links -->
     <ul class="navbar-nav mr-auto-navbav">
@@ -115,7 +124,6 @@
   </div>
   <!-- /.content-wrapper -->
   <footer class="main-footer">
-    <strong> توسعه دهنده آرش محمد قلی نژاد</strong>
   </footer>
 
   <!-- Control Sidebar -->

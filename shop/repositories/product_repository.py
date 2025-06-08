@@ -74,7 +74,7 @@ class ProductRepository(BaseRepository[Product]):
         """Get all products in a category."""
         try:
             category = Category.objects.get(slug=category_slug, status=True)
-            return list(Product.objects.filter(category=category))
+            return list(Product.objects.filter(category__in=[category]))
         except Category.DoesNotExist:
             return []
 

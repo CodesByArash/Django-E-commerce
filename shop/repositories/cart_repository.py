@@ -2,7 +2,7 @@ from typing import Optional, List, Tuple
 from django.core.paginator import Paginator
 from django.shortcuts import get_object_or_404
 from .base_repository import BaseRepository
-from shop.models import Cart, CartItem, Product, Order, OrderDetails
+from shop.models import Cart, CartItem, Product, Order, OrderItem
 
 class CartRepository(BaseRepository[Cart]):
     """Repository for Cart and CartItem model database operations."""
@@ -116,18 +116,19 @@ class CartRepository(BaseRepository[Cart]):
         """Create an order from cart items and clear the cart."""
         # Create order
         order = Order.objects.create(
-            costumer=cart.user,
-            total=str(cart.total_price),
-            status='p'  # در حال پردازش
+            user=cart.user,
+            total_price=cart.total_price,
+            status='processing',  # در حال پردازش
+            shipping_address=''
         )
         
-        # Create order details
+        # Create order items
         for item in cart.items.all():
-            OrderDetails.objects.create(
+            OrderItem.objects.create(
                 order=order,
-                Item=item.product,
-                quantity=str(item.quantity),
-                price=str(item.price)
+                product=item.product,
+                quantity=item.quantity,
+                price=item.price
             )
         
         # Clear cart

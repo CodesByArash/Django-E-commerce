@@ -33,7 +33,6 @@ urlpatterns = [
     path('category/<slug:slug>/', CategoryView.as_view(), name='category'),
     
     # Cart URLs
-    path('cart/', RedirectView.as_view(pattern_name='shop:checkout', permanent=True), name='cart'),
     path('cart/add/<int:product_id>/', AddToCartView.as_view(), name='add_to_cart'),
     path('cart/update/<int:product_id>/', UpdateCartView.as_view(), name='update_cart'),
     path('cart/remove/<int:product_id>/', RemoveFromCartView.as_view(), name='remove_from_cart'),
