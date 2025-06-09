@@ -59,7 +59,6 @@ class Product(models.Model):
         verbose_name_plural='محصولات'
     
     def get_absolute_url(self):
-        # چون category یک ManyToManyField است، از اولین دسته‌بندی استفاده می‌کنیم
         first_category = self.category.first()
         if first_category:
             return f'/{first_category.slug}/{self.slug}/'
@@ -74,7 +73,7 @@ class Product(models.Model):
             return 'http://1277.0.01:8000'+ self.thumbnail.url
     
     def make_thumbnail(self, image, size=(300, 200)):
-        img       = Image.open(image)
+        img = Image.open(image)
         img.convert('RGB')
         img.thumbnail(size)
 
@@ -120,7 +119,6 @@ class Cart(models.Model):
 
     def save(self, *args, **kwargs):
         if self.is_active:
-            # غیرفعال کردن سایر سبدهای خرید فعال کاربر
             Cart.objects.filter(user=self.user, is_active=True).exclude(pk=self.pk).update(is_active=False)
         super().save(*args, **kwargs)
 
@@ -129,16 +127,13 @@ class Cart(models.Model):
 
     @property
     def total_price(self):
-        """محاسبه قیمت کل سبد خرید"""
         return sum(item.total_price for item in self.items.all())
 
     @property
     def total_items(self):
-        """تعداد کل آیتم‌ها در سبد خرید"""
         return sum(item.quantity for item in self.items.all())
 
     def clear(self):
-        """پاک کردن تمام آیتم‌های سبد خرید"""
         self.items.all().delete()
 
 class CartItem(models.Model):
@@ -182,16 +177,13 @@ class CartItem(models.Model):
 
     @property
     def total_price(self):
-        """محاسبه قیمت کل آیتم"""
         return self.price * self.quantity
 
     def increase_quantity(self, amount=1):
-        """افزایش تعداد محصول"""
         self.quantity += amount
         self.save()
 
     def decrease_quantity(self, amount=1):
-        """کاهش تعداد محصول"""
         if self.quantity > amount:
             self.quantity -= amount
             self.save()
@@ -263,22 +255,17 @@ class Order(models.Model):
         super().save(*args, **kwargs)
 
     def generate_tracking_number(self):
-        """Generate a unique tracking number for the order."""
         import random
         import string
         from datetime import datetime
         
-        # Get current date components
         now = datetime.now()
-        date_part = now.strftime('%y%m%d')  # YYMMDD format
+        date_part = now.strftime('%y%m%d') 
         
-        # Generate random part (4 characters)
         random_part = ''.join(random.choices(string.ascii_uppercase + string.digits, k=4))
         
-        # Combine date and random parts
         tracking_number = f'ORD-{date_part}-{random_part}'
         
-        # Check if this tracking number already exists
         while Order.objects.filter(tracking_number=tracking_number).exists():
             random_part = ''.join(random.choices(string.ascii_uppercase + string.digits, k=4))
             tracking_number = f'ORD-{date_part}-{random_part}'
@@ -287,11 +274,9 @@ class Order(models.Model):
 
     @property
     def total_items(self):
-        """تعداد کل آیتم‌ها در سفارش"""
         return sum(item.quantity for item in self.items.all())
 
     def get_total_price(self):
-        """محاسبه قیمت کل سفارش"""
         return sum(item.total_price for item in self.items.all())
 
 class OrderItem(models.Model):
@@ -331,5 +316,4 @@ class OrderItem(models.Model):
 
     @property
     def total_price(self):
-        """محاسبه قیمت کل آیتم"""
         return self.price * self.quantity

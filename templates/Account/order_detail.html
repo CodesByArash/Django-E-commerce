@@ -42,8 +42,13 @@
                                 <span class="badge badge-danger">لغو شده</span>
                             {% endif %}
                         </p>
+                        {% if order.tracking_number %}
+                            <p><strong>کد رهگیری:</strong> <span class="badge badge-primary">{{ order.tracking_number }}</span></p>
+                        {% endif %}
                         {% if order.tracking_code %}
-                            <p><strong>کد رهگیری:</strong> {{ order.tracking_code }}</p>
+                            <p><strong>کد پستی:</strong> <span class="badge badge-info">{{ order.tracking_code }}</span></p>
+                        {% else %}
+                            <p><strong>کد پستی:</strong> <span class="text-muted">ثبت نشده</span></p>
                         {% endif %}
                         <p><strong>تعداد کل اقلام:</strong> {{ order.total_items }} عدد</p>
                     </div>
