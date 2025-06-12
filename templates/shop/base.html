@@ -40,26 +40,15 @@
                                     <div class="row row-cols-2 g-2">
                                         {% for category in categories_tree %}
                                             <div class="col">
-                                                {% if category.children.all %}
-                                                    <div class="dropdown-submenu">
-                                                        <a class="dropdown-item text-center px-2 py-2 {% if request.resolver_match.kwargs.slug == category.slug %}active{% endif %}" href="{% url 'shop:category' category.slug %}">
-                                                            {{ category.title }}
-                                                        </a>
-                                                        <div class="dropdown-menu">
-                                                            {% for child in category.children.all %}
-                                                                <a class="dropdown-item text-center px-2 py-2 {% if request.resolver_match.kwargs.slug == child.slug %}active{% endif %}" href="{% url 'shop:category' child.slug %}">
-                                                                    {{ child.title }}
-                                                                </a>
-                                                            {% endfor %}
-                                                        </div>
-                                                    </div>
-                                                {% else %}
-                                                    <a class="dropdown-item text-center px-2 py-2 {% if request.resolver_match.kwargs.slug == category.slug %}active{% endif %}" href="{% url 'shop:category' category.slug %}">
-                                                        {{ category.title }}
-                                                    </a>
-                                                {% endif %}
+                                                {% include 'shop/recursive_category_menu.html' with category=category %}
                                             </div>
                                         {% endfor %}
+                                    </div>
+                                    <hr class="my-2">
+                                    <div class="text-center">
+                                        <a href="{% url 'shop:categories' %}" class="btn btn-outline-primary btn-sm">
+                                            <i class="fas fa-list"></i> مشاهده همه دسته‌بندی‌ها
+                                        </a>
                                     </div>
                                 </div>
                             </div>
@@ -117,16 +106,53 @@
             document.getElementById("cart").innerHTML = '<i class="fas fa-shopping-cart"></i> سبد خرید (' + count + ')';
         }
         
-        // Handle nested dropdowns
+        // Handle recursive nested dropdowns
         $(document).ready(function() {
+            var timeout;
+            
+            // Show submenu on hover
             $('.dropdown-submenu > a').on("mouseenter", function(e) {
+                clearTimeout(timeout);
                 var submenu = $(this).next('.dropdown-menu');
+                // Hide all other submenus first
+                $('.dropdown-submenu .dropdown-menu').not(submenu).hide();
                 submenu.show();
             });
             
+            // Keep submenu open when hovering over submenu
+            $('.dropdown-submenu .dropdown-menu').on("mouseenter", function(e) {
+                clearTimeout(timeout);
+                $(this).show();
+            });
+            
+            // Hide submenu when leaving the entire dropdown area
             $('.dropdown-submenu').on("mouseleave", function(e) {
-                var submenu = $(this).find('.dropdown-menu');
-                submenu.hide();
+                var $this = $(this);
+                timeout = setTimeout(function() {
+                    $this.find('.dropdown-menu').hide();
+                }, 200); // Longer delay to allow moving to submenu
+            });
+            
+            // Hide submenu when leaving submenu area
+            $('.dropdown-submenu .dropdown-menu').on("mouseleave", function(e) {
+                var $this = $(this);
+                timeout = setTimeout(function() {
+                    $this.hide();
+                }, 200);
+            });
+            
+            // Keep main dropdown open when hovering over it
+            $('#categoriesDropdown').on("mouseenter", function(e) {
+                clearTimeout(timeout);
+                $('.categories-menu').show();
+            });
+            
+            // Hide main dropdown when leaving the entire dropdown area
+            $('.nav-item.dropdown').on("mouseleave", function(e) {
+                timeout = setTimeout(function() {
+                    $('.categories-menu').hide();
+                    $('.dropdown-submenu .dropdown-menu').hide();
+                }, 300);
             });
         });
     </script>

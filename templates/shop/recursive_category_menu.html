@@ -1,0 +1,16 @@
+{% if category.children.all %}
+    <div class="dropdown-submenu">
+        <a class="dropdown-item text-center px-2 py-2 {% if request.resolver_match.kwargs.slug == category.slug %}active{% endif %}" href="{% url 'shop:category' category.slug %}">
+            {{ category.title }}
+        </a>
+        <div class="dropdown-menu">
+            {% for child in category.children.all %}
+                {% include 'shop/recursive_category_menu.html' with category=child %}
+            {% endfor %}
+        </div>
+    </div>
+{% else %}
+    <a class="dropdown-item text-center px-2 py-2 {% if request.resolver_match.kwargs.slug == category.slug %}active{% endif %}" href="{% url 'shop:category' category.slug %}">
+        {{ category.title }}
+    </a>
+{% endif %} 

@@ -270,7 +270,7 @@
                         <h5>اطلاعات ارسال</h5>
                     </div>
                     <div class="card-body">
-                        <form method="post" id="checkout-form">
+                        <form method="post" action="{% url 'go-to-gateway' %}" id="checkout-form">
                             {% csrf_token %}
                             <div class="row g-2">
                                 <div class="col-md-6">

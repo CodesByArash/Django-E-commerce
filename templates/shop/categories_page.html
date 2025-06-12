@@ -1,0 +1,60 @@
+{% extends 'shop/base.html' %}
+{% load static %}
+
+{% block title %}دسته‌بندی‌ها - فروشگاه{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'shop/category.css' %}">
+<style>
+    .categories-container {
+        max-width: 800px;
+        margin: 0 auto;
+        padding: 2rem 0;
+    }
+    
+    .categories-header {
+        text-align: center;
+        margin-bottom: 2rem;
+        padding: 2rem 0;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        border-radius: 10px;
+    }
+    
+    .categories-header h1 {
+        margin: 0;
+        font-size: 2.5rem;
+        font-weight: 300;
+    }
+    
+    .categories-header p {
+        margin: 1rem 0 0 0;
+        opacity: 0.9;
+        font-size: 1.1rem;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="categories-container">
+    <div class="categories-header">
+        <h1>دسته‌بندی‌های محصولات</h1>
+        <p>تمام دسته‌بندی‌ها و زیرمجموعه‌های فروشگاه</p>
+    </div>
+    
+    <div class="row">
+        <div class="col-12">
+            {% if categories_tree %}
+                {% for category in categories_tree %}
+                    {% include 'shop/vertical_category_menu.html' with category=category %}
+                {% endfor %}
+            {% else %}
+                <div class="alert alert-info text-center">
+                    <i class="fas fa-info-circle"></i>
+                    هیچ دسته‌بندی‌ای یافت نشد.
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %} 

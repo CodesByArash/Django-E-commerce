@@ -1,0 +1,19 @@
+{% if category.children.all %}
+    <div class="vertical-category-item">
+        <a class="vertical-category-link {% if request.resolver_match.kwargs.slug == category.slug %}active{% endif %}" href="{% url 'shop:category' category.slug %}">
+            <i class="fas fa-folder"></i> {{ category.title }}
+            <i class="fas fa-chevron-left float-left"></i>
+        </a>
+        <div class="vertical-submenu">
+            {% for child in category.children.all %}
+                {% include 'shop/vertical_category_menu.html' with category=child %}
+            {% endfor %}
+        </div>
+    </div>
+{% else %}
+    <div class="vertical-category-item">
+        <a class="vertical-category-link {% if request.resolver_match.kwargs.slug == category.slug %}active{% endif %}" href="{% url 'shop:category' category.slug %}">
+            <i class="fas fa-tag"></i> {{ category.title }}
+        </a>
+    </div>
+{% endif %} 
