@@ -1,0 +1,112 @@
+{% extends 'shop/base.html' %}
+{% load static %}
+
+{% block title %}نتایج جستجو برای "{{ search_query }}" - فروشگاه{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'shop/category.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="category-header">
+    <div class="container text-center">
+        <h1 class="category-title">نتایج جستجو برای "{{ search_query }}"</h1>
+        <p class="text-muted">تعداد نتایج: {{ products|length }}</p>
+    </div>
+</div>
+
+<div class="container">
+    <div class="row">
+        {% for product in products %}
+        <div class="col-md-6 col-lg-4 col-xl-3 mb-4">
+            <div class="card h-100">
+                {% if product.image %}
+                <img src="{{ product.image.url }}" class="card-img-top" alt="{{ product.name }}">
+                {% else %}
+                <img src="{% static 'shop/images/no-image.png' %}" class="card-img-top" alt="بدون تصویر">
+                {% endif %}
+                <div class="card-body">
+                    <h5 class="card-title">{{ product.name }}</h5>
+                    <div class="card-text">{{ product.description|safe|truncatechars:100 }}</div>
+                    <p class="card-text"><strong>قیمت:</strong> {{ product.price }} تومان</p>
+                    <div class="d-flex justify-content-between align-items-center">
+                        {% if product.quantity > 0 %}
+                            <form method="post" action="{% url 'shop:add_to_cart' product.id %}" class="add-to-cart-form">
+                                {% csrf_token %}
+                                <button type="submit" class="btn btn-primary btn-sm">
+                                    <i class="fas fa-cart-plus"></i> افزودن به سبد
+                                </button>
+                            </form>
+                        {% else %}
+                            <button class="btn btn-secondary btn-sm" disabled>
+                                <i class="fas fa-times-circle"></i> ناموجود
+                            </button>
+                        {% endif %}
+                        <a href="{% url 'shop:detail' product.id %}" class="btn btn-outline-primary btn-sm">
+                            <i class="fas fa-eye"></i> مشاهده
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% empty %}
+        <div class="col-12">
+            <div class="alert alert-info text-center">
+                <i class="fas fa-search fa-3x mb-3"></i>
+                <h4>نتیجه‌ای یافت نشد</h4>
+                <p>متأسفانه هیچ محصولی با عبارت "{{ search_query }}" یافت نشد.</p>
+                <p>لطفاً عبارت جستجوی خود را تغییر دهید یا از دسته‌بندی‌های موجود استفاده کنید.</p>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
+    {% if products.has_other_pages %}
+    <div class="row mt-4">
+        <div class="col-12">
+            <nav aria-label="Page navigation">
+                <ul class="pagination justify-content-center">
+                    {% if products.has_previous %}
+                    <li class="page-item">
+                        <a class="page-link" href="?q={{ search_query }}&page={{ products.previous_page_number }}" aria-label="Previous">
+                            <span aria-hidden="true">&raquo;</span>
+                        </a>
+                    </li>
+                    {% endif %}
+
+                    {% for num in products.paginator.page_range %}
+                    {% if products.number == num %}
+                    <li class="page-item active">
+                        <span class="page-link">{{ num }}</span>
+                    </li>
+                    {% else %}
+                    <li class="page-item">
+                        <a class="page-link" href="?q={{ search_query }}&page={{ num }}">{{ num }}</a>
+                    </li>
+                    {% endif %}
+                    {% endfor %}
+
+                    {% if products.has_next %}
+                    <li class="page-item">
+                        <a class="page-link" href="?q={{ search_query }}&page={{ products.next_page_number }}" aria-label="Next">
+                            <span aria-hidden="true">&laquo;</span>
+                        </a>
+                    </li>
+                    {% endif %}
+                </ul>
+            </nav>
+        </div>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}
+
+{% block extra_js %}
+{% if messages %}
+<!-- <script>
+    {% for message in messages %}
+        alert("{{ message }}");
+    {% endfor %}
+</script> -->
+{% endif %}
+{% endblock %} 

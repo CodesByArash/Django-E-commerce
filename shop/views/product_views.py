@@ -72,4 +72,32 @@ class CategoryView(ListView):
         context = super().get_context_data(**kwargs)
         context['current_category'] = get_object_or_404(Category, slug=self.kwargs['slug'], status=True)
         context['categories'] = self.product_repository.get_all_categories()
+        return context
+
+class SearchView(ListView):
+    """View for displaying search results."""
+    template_name = 'shop/search.html'
+    context_object_name = 'products'
+    paginate_by = 8
+
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        self.product_repository = ProductRepository()
+
+    def get_queryset(self):
+        """Get products matching search query."""
+        search_query = self.request.GET.get('q')
+        if not search_query:
+            return Product.objects.none()
+        return self.product_repository.search_by_title(
+            search_query,
+            page=self.request.GET.get('page'),
+            per_page=self.paginate_by
+        )
+
+    def get_context_data(self, **kwargs):
+        """Add search query and categories to context."""
+        context = super().get_context_data(**kwargs)
+        context['search_query'] = self.request.GET.get('q', '')
+        context['categories'] = self.product_repository.get_all_categories()
         return context 

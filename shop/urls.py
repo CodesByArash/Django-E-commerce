@@ -17,7 +17,7 @@ from django.urls import path
 from django.views.generic import RedirectView
 from .views import (
     # Product views
-    IndexView, ProductDetailView, CategoryView,
+    IndexView, ProductDetailView, CategoryView, SearchView,
     # Cart views
     CheckoutView, AddToCartView, UpdateCartView, RemoveFromCartView, SuccessView,
 )
@@ -29,6 +29,7 @@ urlpatterns = [
     path('', IndexView.as_view(), name='index'),
     path('product/<int:id>/', ProductDetailView.as_view(), name='detail'),
     path('category/<slug:slug>/', CategoryView.as_view(), name='category'),
+    path('search/', SearchView.as_view(), name='search'),
     
     # Cart URLs
     path('cart/add/<int:product_id>/', AddToCartView.as_view(), name='add_to_cart'),

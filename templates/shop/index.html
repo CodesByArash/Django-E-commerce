@@ -22,7 +22,7 @@
                         <div class="card-title">
                             <a href="{% url 'shop:detail' product.id %}">{{product.title}}</a>
                         </div>
-                        <div class="card-text">{{ product.description|safe|truncatechars:100 }}</div>
+                        <!-- <div class="card-text">{{ product.description|safe|truncatechars:100 }}</div> -->
                         <p class="card-text"><strong>قیمت:</strong> {{ product.price }} تومان</p>
                         <div class="d-flex justify-content-between align-items-center">
                             {% if product.quantity > 0 %}
