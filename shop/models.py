@@ -234,6 +234,9 @@ class Order(models.Model):
         verbose_name='کاربر',
         related_name='orders'
     )
+
+    payment = models.ForeignKey('Payment', on_delete=models.SET_NULL, null = True)
+
     created_at = models.DateTimeField(
         auto_now_add=True,
         verbose_name='تاریخ ثبت'
@@ -346,3 +349,62 @@ class OrderItem(models.Model):
     @property
     def total_price(self):
         return self.price * self.quantity
+    
+
+class Payment(models.Model):
+    STATUS_CHOICES = (
+        ('pending', 'در انتظار پرداخت'),
+        ('completed', 'پرداخت شده'),
+        ('failed', 'ناموفق'),
+        ('cancelled', 'لغو شده'),
+        ('refunded', 'بازگشت وجه'),
+    )
+    
+    PAYMENT_METHOD_CHOICES = (
+        ('online', 'پرداخت آنلاین'),
+        ('cash', 'پرداخت نقدی'),
+        ('bank_transfer', 'انتقال بانکی'),
+        ('wallet', 'کیف پول'),
+    )
+    
+    user = models.ForeignKey(
+        User, 
+        on_delete=models.CASCADE,
+        verbose_name='کاربر',
+        related_name='payments'
+    )
+    payment_number = models.CharField(
+        max_length=100,
+        verbose_name='شماره پرداخت'
+    )
+    payment_method = models.CharField(
+        max_length=20,
+        choices=PAYMENT_METHOD_CHOICES,
+        verbose_name='روش پرداخت'
+    )
+    amount_paid = models.DecimalField(
+        max_digits=10,
+        decimal_places=2,
+        verbose_name='مبلغ پرداختی',
+        null=True,
+        blank=True,
+        default=0
+    )
+    status = models.CharField(
+        max_length=20,
+        choices=STATUS_CHOICES,
+        default='pending',
+        verbose_name='وضعیت پرداخت'
+    )
+    created_at = models.DateTimeField(
+        auto_now_add=True,
+        verbose_name='تاریخ ایجاد'
+    )
+
+    class Meta:
+        verbose_name = 'پرداخت'
+        verbose_name_plural = 'پرداخت‌ها'
+        ordering = ['-created_at']
+
+    def __str__(self):
+        return f'پرداخت {self.payment_number} - {self.user.email}'

@@ -1,6 +1,6 @@
 from django.contrib import admin
 from django.contrib.admin.options import ModelAdmin
-from .models import Product, Order, Category, OrderItem, Cart, CartItem
+from .models import Product, Order, Category, OrderItem, Cart, CartItem, Payment
 
 
 admin.site.site_header = "فروشگاه"
@@ -93,10 +93,26 @@ class OrderItemAdmin(admin.ModelAdmin):
         return obj.total_price
     total_price.short_description = 'قیمت کل'
 
+class PaymentAdmin(admin.ModelAdmin):
+    list_display = ('payment_number', 'user', 'payment_method', 'amount_paid', 'status', 'created_at')
+    list_filter = ('status', 'payment_method', 'created_at')
+    search_fields = ('payment_number', 'user__email', 'user__username')
+    readonly_fields = ('created_at',)
+    ordering = ('-created_at',)
+    list_per_page = 20
+
+    def get_queryset(self, request):
+        return super().get_queryset(request).select_related('user')
+
+    def amount_paid_formatted(self, obj):
+        return f"{obj.amount_paid:,} تومان"
+    amount_paid_formatted.short_description = 'مبلغ پرداختی'
+
 admin.site.register(Category, CategoryAdmin)
 admin.site.register(Product, ProductAdmin)
 admin.site.register(Order, OrderAdmin)
 admin.site.register(OrderItem, OrderItemAdmin)
 admin.site.register(Cart, CartAdmin)
 admin.site.register(CartItem, CartItemAdmin)
+admin.site.register(Payment, PaymentAdmin)
 
