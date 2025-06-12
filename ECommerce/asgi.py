@@ -1,5 +1,5 @@
 """
-ASGI config for DrugStore project.
+ASGI config for Ecommerce project.
 
 It exposes the ASGI callable as a module-level variable named ``application``.
 
@@ -11,6 +11,6 @@ import os
 
 from django.core.asgi import get_asgi_application
 
-os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'DrugStore.settings')
+os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'Ecommerce.settings')
 
 application = get_asgi_application()

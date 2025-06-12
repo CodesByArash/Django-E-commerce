@@ -1,4 +1,4 @@
-"""DrugStore URL Configuration
+"""Ecommerce URL Configuration
 
 The `urlpatterns` list routes URLs to views. For more information please see:
     https://docs.djangoproject.com/en/3.2/topics/http/urls/
@@ -23,6 +23,9 @@ from rest_framework import permissions
 from drf_yasg.views import get_schema_view
 from drf_yasg import openapi
 
+from azbankgateways.urls import az_bank_gateways_urls
+from shop.bank import go_to_gateway_view, callback_gateway_view
+
 
 schema_view = get_schema_view(
    openapi.Info(
@@ -38,6 +41,7 @@ schema_view = get_schema_view(
 )
 
 
+admin.autodiscover()
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -45,6 +49,13 @@ urlpatterns = [
     path('account/', include('account.urls')),
     path('api/account/', include('api.api_account.urls')),
     path('api/shop/', include('api.api_shop.urls')),
+
+    #bank gateways
+    path('bankgateways/', az_bank_gateways_urls()),
+    path('go-to-gateways/', go_to_gateway_view, name = "go-to-gateway"),
+    path('callback-gateway/', callback_gateway_view, name = "call-back-gateway"),
+
+    #drf_yasg
     path('swagger<format>/', schema_view.without_ui(cache_timeout=0), name='schema-json'),
     path('swagger/', schema_view.with_ui('swagger', cache_timeout=0), name='schema-swagger-ui'),
     path('redoc/', schema_view.with_ui('redoc', cache_timeout=0), name='schema-redoc'),
