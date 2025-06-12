@@ -21,6 +21,26 @@ class CategoryRepository(BaseRepository[Category]):
             return list(paginator.get_page(page))
         return list(categories)
 
+    def get_root_categories(self) -> List[Category]:
+        """Get only root categories (categories without parent)."""
+        return list(Category.objects.filter(parent__isnull=True, status=True))
+
+    def get_children(self, parent_id: int) -> List[Category]:
+        """Get direct children of a category."""
+        return list(Category.objects.filter(parent_id=parent_id, status=True))
+
+    def get_all_children_recursive(self, parent_id: int) -> List[Category]:
+        """Get all children of a category recursively."""
+        try:
+            parent = Category.objects.get(id=parent_id)
+            return parent.get_all_children()
+        except Category.DoesNotExist:
+            return []
+
+    def get_category_tree(self) -> List[Category]:
+        """Get categories organized in a tree structure (only root categories with prefetched children)."""
+        return list(Category.objects.filter(parent__isnull=True, status=True).prefetch_related('children'))
+
     def create(self, **kwargs) -> Category:
         """Create a new category."""
         return Category.objects.create(**kwargs)

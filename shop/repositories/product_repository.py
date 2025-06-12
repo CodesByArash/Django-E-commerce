@@ -71,10 +71,12 @@ class ProductRepository(BaseRepository[Product]):
         return list(products)
 
     def get_by_category(self, category_slug: str) -> List[Product]:
-        """Get all products in a category."""
+        """Get all products in a category including nested categories."""
         try:
             category = Category.objects.get(slug=category_slug, status=True)
-            return list(Product.objects.filter(category__in=[category]))
+            # Get all children categories recursively
+            all_categories = [category] + category.get_all_children()
+            return list(Product.objects.filter(category__in=all_categories))
         except Category.DoesNotExist:
             return []
 

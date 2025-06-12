@@ -585,3 +585,97 @@ body {
 .col-md-6, .col-lg-4, .col-xl-3 {
     padding: 0 10px;
 }
+
+/* Nested Dropdown Styles */
+.dropdown-submenu {
+    position: relative;
+}
+
+.dropdown-submenu .dropdown-menu {
+    top: 0;
+    right: 100%;
+    margin-top: -1px;
+    margin-right: 0.125rem;
+    min-width: 200px;
+    display: none;
+    position: absolute;
+    z-index: 1001;
+}
+
+.dropdown-submenu:hover > .dropdown-menu {
+    display: block !important;
+}
+
+.dropdown-submenu > a:after {
+    display: block;
+    content: " ";
+    float: left;
+    width: 0;
+    height: 0;
+    border-color: transparent;
+    border-style: solid;
+    border-width: 5px 0 5px 5px;
+    border-left-color: #ccc;
+    margin-top: 5px;
+    margin-right: -10px;
+}
+
+.dropdown-submenu:hover > a:after {
+    border-left-color: #fff;
+}
+
+.dropdown-submenu.pull-left {
+    float: none;
+}
+
+.dropdown-submenu.pull-left > .dropdown-menu {
+    right: -100%;
+    margin-right: 10px;
+    -webkit-border-radius: 6px 0 6px 6px;
+    -moz-border-radius: 6px 0 6px 6px;
+    border-radius: 6px 0 6px 6px;
+}
+
+/* RTL specific nested dropdown adjustments */
+.dropdown-submenu .dropdown-menu {
+    right: 100%;
+    left: auto;
+}
+
+.dropdown-submenu > a:after {
+    float: left;
+    border-width: 5px 5px 5px 0;
+    border-left-color: transparent;
+    border-right-color: #ccc;
+    margin-right: -10px;
+    margin-left: 0;
+}
+
+.dropdown-submenu:hover > a:after {
+    border-right-color: #fff;
+    border-left-color: transparent;
+}
+
+.dropdown-submenu.pull-left > .dropdown-menu {
+    left: -100%;
+    right: auto;
+    margin-left: 10px;
+    margin-right: 0;
+    -webkit-border-radius: 0 6px 6px 6px;
+    -moz-border-radius: 0 6px 6px 6px;
+    border-radius: 0 6px 6px 6px;
+}
+
+/* Additional styles to ensure proper positioning */
+.categories-menu {
+    position: relative;
+}
+
+.dropdown-submenu .dropdown-item {
+    position: relative;
+}
+
+.dropdown-submenu .dropdown-menu .dropdown-item {
+    white-space: nowrap;
+    padding: 0.5rem 1rem;
+}

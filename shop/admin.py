@@ -1,14 +1,11 @@
 from django.contrib import admin
 from django.contrib.admin.options import ModelAdmin
 from .models import Product, Order, Category, OrderItem, Cart, CartItem
-# Register your models here.
 
 
 admin.site.site_header = "فروشگاه"
 admin.site.site_title  = "پنل مدیریت فروشگاه"
 admin.site.index_title = "مدیریت سفارشات"
-
-
 
 
 
@@ -43,12 +40,18 @@ class OrderAdmin(admin.ModelAdmin):
 
 
 class CategoryAdmin(admin.ModelAdmin):
-
-    list_display = ('title', 'slug', 'status', 'position')
+    list_display = ('title', 'slug', 'parent', 'status', 'position', 'get_level')
     search_fields = ('title', 'slug')
-    list_filter = ('status',)
+    list_filter = ('status', 'parent')
     prepopulated_fields = {'slug': ('title',)}
     
+    def get_level(self, obj):
+        return obj.get_level()
+    get_level.short_description = 'سطح'
+    get_level.admin_order_field = 'parent'
+    
+    def get_queryset(self, request):
+        return super().get_queryset(request).select_related('parent')
 
 class CartItemInline(admin.TabularInline):
     model = CartItem
@@ -96,3 +99,4 @@ admin.site.register(Order, OrderAdmin)
 admin.site.register(OrderItem, OrderItemAdmin)
 admin.site.register(Cart, CartAdmin)
 admin.site.register(CartItem, CartItemAdmin)
+

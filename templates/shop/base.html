@@ -1,4 +1,5 @@
 {% load static %}
+{% load category_tags %}
 
 <!DOCTYPE html>
 <html lang="fa" dir="rtl">
@@ -29,46 +30,37 @@
             <div class="collapse navbar-collapse" id="navbarNav">
                 <div class="d-flex justify-content-between w-100 align-items-center">
                     <div class="d-flex align-items-center">
-                        {% if categories %}
+                        {% if categories_tree %}
                         <li class="nav-item dropdown list-unstyled">
                             <a class="nav-link dropdown-toggle" href="#" id="categoriesDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                                 دسته‌بندی‌ها
                             </a>
                             <div class="dropdown-menu dropdown-menu-right categories-menu" aria-labelledby="categoriesDropdown" style="min-width: 300px;">
                                 <div class="container p-3">
-                                    {% with total_categories=categories|length %}
-                                    {% if total_categories <= 6 %}
-                                        <div class="row row-cols-2 g-2">
-                                            {% for cat in categories %}
-                                                <div class="col">
-                                                    <a class="dropdown-item text-center px-2 py-2 {% if request.resolver_match.kwargs.slug == cat.slug %}active{% endif %}" href="{% url 'shop:category' cat.slug %}">
-                                                        {{cat.title}}
+                                    <div class="row row-cols-2 g-2">
+                                        {% for category in categories_tree %}
+                                            <div class="col">
+                                                {% if category.children.all %}
+                                                    <div class="dropdown-submenu">
+                                                        <a class="dropdown-item text-center px-2 py-2 {% if request.resolver_match.kwargs.slug == category.slug %}active{% endif %}" href="{% url 'shop:category' category.slug %}">
+                                                            {{ category.title }}
+                                                        </a>
+                                                        <div class="dropdown-menu">
+                                                            {% for child in category.children.all %}
+                                                                <a class="dropdown-item text-center px-2 py-2 {% if request.resolver_match.kwargs.slug == child.slug %}active{% endif %}" href="{% url 'shop:category' child.slug %}">
+                                                                    {{ child.title }}
+                                                                </a>
+                                                            {% endfor %}
+                                                        </div>
+                                                    </div>
+                                                {% else %}
+                                                    <a class="dropdown-item text-center px-2 py-2 {% if request.resolver_match.kwargs.slug == category.slug %}active{% endif %}" href="{% url 'shop:category' category.slug %}">
+                                                        {{ category.title }}
                                                     </a>
-                                                </div>
-                                            {% endfor %}
-                                        </div>
-                                    {% elif total_categories <= 9 %}
-                                        <div class="row row-cols-3 g-2">
-                                            {% for cat in categories %}
-                                                <div class="col">
-                                                    <a class="dropdown-item text-center px-2 py-2 {% if request.resolver_match.kwargs.slug == cat.slug %}active{% endif %}" href="{% url 'shop:category' cat.slug %}">
-                                                        {{cat.title}}
-                                                    </a>
-                                                </div>
-                                            {% endfor %}
-                                        </div>
-                                    {% else %}
-                                        <div class="row row-cols-4 g-2">
-                                            {% for cat in categories %}
-                                                <div class="col">
-                                                    <a class="dropdown-item text-center px-2 py-2 {% if request.resolver_match.kwargs.slug == cat.slug %}active{% endif %}" href="{% url 'shop:category' cat.slug %}">
-                                                        {{cat.title}}
-                                                    </a>
-                                                </div>
-                                            {% endfor %}
-                                        </div>
-                                    {% endif %}
-                                    {% endwith %}
+                                                {% endif %}
+                                            </div>
+                                        {% endfor %}
+                                    </div>
                                 </div>
                             </div>
                         </li>
@@ -124,6 +116,19 @@
         function updateCartCount(count) {
             document.getElementById("cart").innerHTML = '<i class="fas fa-shopping-cart"></i> سبد خرید (' + count + ')';
         }
+        
+        // Handle nested dropdowns
+        $(document).ready(function() {
+            $('.dropdown-submenu > a').on("mouseenter", function(e) {
+                var submenu = $(this).next('.dropdown-menu');
+                submenu.show();
+            });
+            
+            $('.dropdown-submenu').on("mouseleave", function(e) {
+                var submenu = $(this).find('.dropdown-menu');
+                submenu.hide();
+            });
+        });
     </script>
     
     {% block extra_js %}{% endblock %}

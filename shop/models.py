@@ -19,6 +19,7 @@ class Category(models.Model):
     slug     = models.SlugField(max_length=200 , verbose_name="آدرس", unique=True)
     status   = models.BooleanField(default=True , verbose_name="نمایش داده شود؟",)
     position = models.IntegerField(verbose_name='موفعیت')
+    parent   = models.ForeignKey('self', on_delete=models.CASCADE, null=True, blank=True, related_name='children', verbose_name='دسته والد')
 
     class Meta:
         ordering = ['title',]
@@ -36,6 +37,34 @@ class Category(models.Model):
     def get_absolute_url(self):
         return f'/{self.slug}/'
     
+    def get_all_children(self):
+        """دریافت تمام زیرمجموعه‌ها به صورت بازگشتی"""
+        children = []
+        for child in self.children.all():
+            children.append(child)
+            children.extend(child.get_all_children())
+        return children
+    
+    def get_all_parents(self):
+        """دریافت تمام والدین به صورت بازگشتی"""
+        parents = []
+        if self.parent:
+            parents.append(self.parent)
+            parents.extend(self.parent.get_all_parents())
+        return parents
+    
+    def is_root(self):
+        """بررسی اینکه آیا دسته‌بندی ریشه است"""
+        return self.parent is None
+    
+    def get_level(self):
+        """دریافت سطح دسته‌بندی (0 برای ریشه)"""
+        level = 0
+        parent = self.parent
+        while parent:
+            level += 1
+            parent = parent.parent
+        return level
         
 
 class Product(models.Model): 

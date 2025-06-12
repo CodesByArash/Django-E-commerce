@@ -1,0 +1,12 @@
+{% for category in categories %}
+    <div class="dropdown-submenu">
+        <a class="dropdown-item text-center px-2 py-2 {% if active_slug == category.slug %}active{% endif %}" href="{% url 'shop:category' category.slug %}">
+            {{ category.title }}
+        </a>
+        {% if category.children.all %}
+            <div class="dropdown-menu">
+                {% include 'shop/category_menu.html' with categories=category.children.all active_slug=active_slug %}
+            </div>
+        {% endif %}
+    </div>
+{% endfor %} 
