@@ -1,4 +1,4 @@
-"""DrugStore URL Configuration
+"""Ecommerce Shop URL Configuration
 
 The `urlpatterns` list routes URLs to views. For more information please see:
     https://docs.djangoproject.com/en/3.2/topics/http/urls/
@@ -17,9 +17,9 @@ from django.urls import path
 from django.views.generic import RedirectView
 from .views import (
     # Product views
-    IndexView, ProductDetailView, CategoryView, SearchView,
+    IndexView, ProductDetailView, CategoryView, SearchView, CategoriesView,
     # Cart views
-    CheckoutView, AddToCartView, UpdateCartView, RemoveFromCartView, SuccessView,
+    CheckoutView, AddToCartView, UpdateCartView, RemoveFromCartView, SuccessView, FailureView,
 )
 
 app_name = "shop"
@@ -29,13 +29,14 @@ urlpatterns = [
     path('', IndexView.as_view(), name='index'),
     path('product/<int:id>/', ProductDetailView.as_view(), name='detail'),
     path('category/<slug:slug>/', CategoryView.as_view(), name='category'),
+    path('categories/', CategoriesView.as_view(), name='categories'),
     path('search/', SearchView.as_view(), name='search'),
-    
     # Cart URLs
     path('cart/add/<int:product_id>/', AddToCartView.as_view(), name='add_to_cart'),
     path('cart/update/<int:product_id>/', UpdateCartView.as_view(), name='update_cart'),
     path('cart/remove/<int:product_id>/', RemoveFromCartView.as_view(), name='remove_from_cart'),
     path('checkout/', CheckoutView.as_view(), name='checkout'),
     path('success/', SuccessView.as_view(), name='success'),
+    path('failure/', FailureView.as_view(), name='failure'),
     ]
 

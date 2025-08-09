@@ -1,4 +1,4 @@
-from django.views.generic import ListView, DetailView
+from django.views.generic import ListView, DetailView, TemplateView
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.shortcuts import render, redirect, get_object_or_404
 from django.urls import reverse_lazy
@@ -100,4 +100,19 @@ class SearchView(ListView):
         context = super().get_context_data(**kwargs)
         context['search_query'] = self.request.GET.get('q', '')
         context['categories'] = self.product_repository.get_all_categories()
+        return context
+
+class CategoriesView(TemplateView):
+    """View for displaying all categories in a dedicated page."""
+    template_name = 'shop/categories_page.html'
+
+    def get_context_data(self, **kwargs):
+        """Add categories to context."""
+        context = super().get_context_data(**kwargs)
+        context['categories_tree'] = Category.objects.filter(
+            parent__isnull=True, 
+            status=True
+        ).prefetch_related(
+            'children__children__children__children__children'
+        )
         return context 

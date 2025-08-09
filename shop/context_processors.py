@@ -12,5 +12,11 @@ def active_cart(request):
 
 def categories_tree(request):
     """Context processor to provide nested categories to all templates."""
-    categories = Category.objects.filter(parent__isnull=True, status=True).prefetch_related('children')
+    # Load all categories with their children recursively
+    categories = Category.objects.filter(
+        parent__isnull=True, 
+        status=True
+    ).prefetch_related(
+        'children__children__children__children__children'  # Support up to 5 levels
+    )
     return {'categories_tree': categories} 

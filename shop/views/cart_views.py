@@ -9,6 +9,7 @@ from typing import Any, Dict
 from ..repositories import CartRepository, ProductRepository
 from ..models import Cart, CartItem, Order, OrderItem
 from shop.models import Product
+from payment_views import go_to_gateway_view
 import json
 
 class CartView(LoginRequiredMixin, ListView):
@@ -151,17 +152,21 @@ class CheckoutView(LoginRequiredMixin, TemplateView):
         if not shipping_address:
             messages.error(request, 'لطفا آدرس ارسال را وارد کنید.')
             return redirect('shop:checkout')
-            
-        try:
-            order = self.cart_repository.create_order(cart, shipping_address)
-            messages.success(request, 'سفارش شما با موفقیت ثبت شد.')
-            return redirect('shop:success')
-        except ValueError as e:
-            messages.error(request, f'خطا در ثبت سفارش: {str(e)}')
-            return redirect('shop:checkout')
-        except Exception as e:
-            messages.error(request, 'خطای سیستمی در ثبت سفارش. لطفاً دوباره تلاش کنید.')
-            return redirect('shop:checkout')
+        # try:
+        #     order = self.cart_repository.create_order(cart, shipping_address)
+        #     messages.success(request, 'سفارش شما با موفقیت ثبت شد.')
+        #     return redirect('shop:success')
+        # except ValueError as e:
+        #     messages.error(request, f'خطا در ثبت سفارش: {str(e)}')
+        #     return redirect('shop:checkout')
+        # except Exception as e:
+        #     messages.error(request, 'خطای سیستمی در ثبت سفارش. لطفاً دوباره تلاش کنید.')
+        #     return redirect('shop:checkout')
+        request.session['shipping_address'] = shipping_address
+        return go_to_gateway_view(request)
+
+        
+
 
 class SuccessView(LoginRequiredMixin, TemplateView):
     template_name = 'shop/success.html'
@@ -178,4 +183,19 @@ class SuccessView(LoginRequiredMixin, TemplateView):
             context['order'] = None
             context['order_items'] = []
             context['status_display'] = None
+        return context 
+
+
+class FailureView(LoginRequiredMixin, TemplateView):
+    template_name = 'shop/failure.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        # Get the latest payment for the current user
+        try:
+            from shop.models import Payment
+            payment = Payment.objects.filter(user=self.request.user).latest('created_at')
+            context['payment'] = payment
+        except Payment.DoesNotExist:
+            context['payment'] = None
         return context 

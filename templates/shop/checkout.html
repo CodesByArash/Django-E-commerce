@@ -17,7 +17,7 @@
         object-fit: cover;
         border-radius: 4px;
         display: block;
-        margin: -11px 0;  /* Compensate for cell padding to center the image */
+        margin: -11px 0; 
     }
     
     .table td {
@@ -270,7 +270,10 @@
                         <h5>اطلاعات ارسال</h5>
                     </div>
                     <div class="card-body">
-                        <form method="post" action="{% url 'go-to-gateway' %}" id="checkout-form">
+
+                        <!-- z<form method="post" action="{% url 'go-to-gateway' %}" id="checkout-form"> -->
+
+                        <form method="post" id="checkout-form">
                             {% csrf_token %}
                             <div class="row g-2">
                                 <div class="col-md-6">
@@ -339,10 +342,8 @@
 
 {% block extra_js %}
 {% if messages %}
-<!-- <script>
     {% for message in messages %}
         alert("{{ message }}");
     {% endfor %}
-</script> -->
 {% endif %}
 {% endblock %}

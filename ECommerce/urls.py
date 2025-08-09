@@ -24,7 +24,7 @@ from drf_yasg.views import get_schema_view
 from drf_yasg import openapi
 
 from azbankgateways.urls import az_bank_gateways_urls
-from shop.bank import go_to_gateway_view, callback_gateway_view
+from shop.views.payment_views import go_to_gateway_view, callback_gateway_view
 
 
 schema_view = get_schema_view(

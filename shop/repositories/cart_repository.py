@@ -168,4 +168,4 @@ class CartRepository(BaseRepository[Cart]):
             cart = Cart.objects.get(id=cart_id)
             return sum(item.total_price for item in cart.items.all())
         except Cart.DoesNotExist:
-            return 0.0 
+            return 0.0
