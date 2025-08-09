@@ -271,8 +271,6 @@
                     </div>
                     <div class="card-body">
 
-                        <!-- z<form method="post" action="{% url 'go-to-gateway' %}" id="checkout-form"> -->
-
                         <form method="post" id="checkout-form">
                             {% csrf_token %}
                             <div class="row g-2">
@@ -341,9 +339,11 @@
 {% endblock %}
 
 {% block extra_js %}
-{% if messages %}
-    {% for message in messages %}
-        alert("{{ message }}");
-    {% endfor %}
-{% endif %}
+<script>
+    // {% if messages %}
+    //     {% for message in messages %}
+    //         alert("{{ message }}");
+    //     {% endfor %}
+    // {% endif %}
+</script>
 {% endblock %}

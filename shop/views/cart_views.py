@@ -9,7 +9,7 @@ from typing import Any, Dict
 from ..repositories import CartRepository, ProductRepository
 from ..models import Cart, CartItem, Order, OrderItem
 from shop.models import Product
-from payment_views import go_to_gateway_view
+from .payment_views import go_to_gateway_view
 import json
 
 class CartView(LoginRequiredMixin, ListView):

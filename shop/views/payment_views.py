@@ -18,20 +18,22 @@ def go_to_gateway_view(request):
     
     factory = bankfactories.BankFactory()
     try:
-        bank = factory.auto_create() # or factory.create(bank_models.BankType.BMI) or set identifier
+        bank = (factory.auto_create()) # or factory.create(bank_models.BankType.BMI) or set identifier
         bank.set_request(request)
         bank.set_amount(total_price)
         # یو آر ال بازگشت به نرم افزار برای ادامه فرآیند
-        bank.set_client_callback_url('/callback-gateway/')
-        
+        bank.set_client_callback_url(reverse("call-back-gateway"))
         # در صورت تمایل اتصال این رکورد به رکورد فاکتور یا هر چیزی که بعدا بتوانید ارتباط بین محصول یا خدمات را با این
-        # پرداخت برقرار کنید. 
-        bank_record = bank.ready()
+        # پرداخت برقرار کنید.
+        print("3")
 
+        bank_record = bank.ready()
+        print("3")
         # هدایت کاربر به درگاه بانک
         return bank.redirect_gateway()
     except AZBankGatewaysException as e:
         logging.critical(e)
+        print(e)
         # TODO: redirect to failed page.
         # cart_repository.clear_cart(cart)
         messages.error(request, 'خطای سیستمی در هدایت به درگاه بانکی...')

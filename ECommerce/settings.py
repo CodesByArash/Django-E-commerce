@@ -150,7 +150,6 @@ CRISPY_TEMPLATE_PACK = 'bootstrap4'
 
 AZ_IRANIAN_BANK_GATEWAYS = {
     "GATEWAYS": {
-
         "ZARINPAL": {
             "MERCHANT_CODE": "sdgtgjhkyioplrndmkrtygfkdlserpwderds",
             "SANDBOX": 1, 

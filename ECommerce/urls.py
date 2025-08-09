@@ -52,7 +52,7 @@ urlpatterns = [
 
     #bank gateways
     path('bankgateways/', az_bank_gateways_urls()),
-    path('go-to-gateways/', go_to_gateway_view, name = "go-to-gateway"),
+    # path('go-to-gateways/', go_to_gateway_view, name = "go-to-gateway"),
     path('callback-gateway/', callback_gateway_view, name = "call-back-gateway"),
 
     #drf_yasg
